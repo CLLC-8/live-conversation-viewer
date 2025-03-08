@@ -27,7 +27,13 @@
             flex-direction: column;
             height: 100vh;
             position: relative;
-            overflow-x: hidden;
+            overflow-x: hidden; /* Empêche le défilement horizontal */
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        * {
+            box-sizing: border-box;
         }
         
         /* Header et navigation */
@@ -38,6 +44,7 @@
             border-bottom: 1px solid rgba(0, 0, 0, 0.5);
             position: relative;
             z-index: 100;
+            width: 100%;
         }
         
         .nav-container {
@@ -48,6 +55,7 @@
             max-width: 1400px;
             margin: 0 auto;
             width: 100%;
+            position: relative;
         }
         
         .logo {
@@ -111,14 +119,17 @@
         }
         
         .hamburger {
-            display: none;
+            display: none; /* Caché par défaut */
             flex-direction: column;
             justify-content: space-between;
             width: 30px;
             height: 21px;
             cursor: pointer;
             z-index: 110;
-            margin-left: auto; /* Aligne à droite */
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
         }
         
         .hamburger span {
@@ -192,6 +203,7 @@
             border-radius: 50%;
             overflow: hidden;
             background-color: #333;
+            flex-shrink: 0; /* Empêche l'avatar de rétrécir */
         }
         
         .user-message .message-avatar {
@@ -211,7 +223,7 @@
         }
         
         .message-bubble {
-            max-width: calc(100% - 200px);
+            max-width: calc(100% - 60px);
             padding: 0.75rem 1rem;
             border-radius: 18px;
             position: relative;
@@ -301,21 +313,23 @@
         
         @media (max-width: 860px) {
             .hamburger {
-                display: flex;
+                display: flex; /* Afficher uniquement sur mobile */
             }
             
             .nav-menu {
                 position: fixed;
                 top: 0;
-                right: -300px;
+                right: -100%; /* Complètement hors de l'écran */
                 height: 100vh;
-                width: 300px;
+                width: 80%; /* Limiter à 80% de la largeur pour les petits écrans */
+                max-width: 300px;
                 flex-direction: column;
-                background-color: var(--header-bg);
+                background-color: rgba(0, 0, 0, 0.9);
                 padding: 4rem 1.5rem 2rem;
                 transition: right 0.3s ease;
                 box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
                 z-index: 100;
+                overflow-y: auto;
             }
             
             .nav-menu.active {
@@ -369,11 +383,15 @@
         
         @media (max-width: 600px) {
             .message-bubble {
-                max-width: calc(100% - 120px);
+                max-width: calc(100% - 60px);
             }
             
             .social-icons {
                 gap: 1.5rem;
+            }
+            
+            .container {
+                padding: 0.75rem;
             }
         }
     </style>
