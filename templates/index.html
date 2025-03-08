@@ -1,4 +1,134 @@
-<!DOCTYPE html>
+<script>
+        // Vanta.js Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            VANTA.FOG({
+                el: "#vanta-background",
+                mouseControls: true,
+                touchControls: true,
+                gyroControls: false,
+                minHeight: 200.00,
+                minWidth: 200.00,
+                highlightColor: 0xff00f0,
+                midtoneColor: 0x2dff,
+                lowlightColor: 0xff1e,
+                baseColor: 0x90606,
+                blurFactor: 0.69,
+                speed: 4.20,
+                zoom: 2.20
+            });
+
+            // Mobile Menu Toggle
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navMenu = document.querySelector('nav ul');
+
+            menuToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+
+            // Socket.IO Configuration
+            const socketUrl = 'https://oracle-live-portal.onrender.com'; // Remplacez par l'URL de votre serveur
+            console.log('Tentative de connexion à:', socketUrl);
+
+            const socket = io(socketUrl, {
+                reconnection: true,
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000,
+                timeout: 5000,
+                transports: ['websocket', 'polling']
+            });
+
+            const chatContainer = document.getElementById('chatContainer');
+            const connectionStatus = document.getElementById('connectionStatus');
+            
+            // Logs de débogage pour la connexion
+            socket.on('connect', () => {
+                console.log('Connexion Socket.IO établie');
+                connectionStatus.innerHTML = '<span class="connected"><i class="fas fa-circle"></i> Canal dimensionnel ouvert</span>';
+            });
+
+            socket.on('connect_error', (error) => {
+                console.error('Erreur de connexion Socket.IO:', error);
+                connectionStatus.innerHTML = '<span class="disconnected"><i class="fas fa-circle"></i> Erreur de connexion</span>';
+            });
+            
+            socket.on('disconnect', (reason) => {
+                console.log('Déconnecté. Raison:', reason);
+                connectionStatus.innerHTML = '<span class="disconnected"><i class="fas fa-circle"></i> Connexion aux dimensions interrompue</span>';
+            });
+            
+            // Fonction pour formater la date
+            function formatDate(date) {
+                const now = new Date();
+                const messageDate = new Date(date);
+                
+                const day = messageDate.getDate().toString().padStart(2, '0');
+                const month = (messageDate.getMonth() + 1).toString().padStart(2, '0');
+                const year = messageDate.getFullYear();
+                const hours = messageDate.getHours().toString().padStart(2, '0');
+                const minutes = messageDate.getMinutes().toString().padStart(2, '0');
+                const seconds = messageDate.getSeconds().toString().padStart(2, '0');
+                
+                return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+            }
+            
+            // Réception des nouveaux messages
+            socket.on('new_message', (data) => {
+                console.log('Nouveau message reçu:', data);
+                
+                // Créer un élément de message
+                const messageDiv = document.createElement('div');
+                
+                // Pour les messages de type info
+                if (data.type === 'info') {
+                    messageDiv.className = 'info-message';
+                    messageDiv.innerHTML = `
+                        <div class="message-content">${data.content}</div>
+                        <div class="timestamp">${formatDate(new Date())}</div>
+                    `;
+                } else {
+                    // Ajouter les classes appropriées selon le type de message
+                    messageDiv.className = `message ${data.type}-message`;
+                    
+                    // Créer le contenu du message
+                    messageDiv.innerHTML = `
+                        <div class="message-bubble">
+                            <div class="message-header">
+                                <span>${data.type === 'user' ? 'Voyageur' : (data.type === 'system' ? 'L\'Oracle' : 'Info')}</span>
+                                <span class="timestamp">${formatDate(new Date())}</span>
+                            </div>
+                            <div class="message-content">${data.content}</div>
+                        </div>
+                        <div class="message-avatar">
+                            <img src="${data.type === 'system' ? '/static/oracle_avatar.png' : '/static/voyageur_avatar.png'}" alt="${data.type === 'system' ? 'Oracle' : 'Voyageur'}">
+                        </div>
+                    `;
+                }
+                
+                // Ajouter le message au conteneur de discussion
+                chatContainer.appendChild(messageDiv);
+                
+                // Faire défiler vers le bas pour voir le nouveau message
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            });
+
+            // Exemple de message de test
+            function sendTestMessage() {
+                console.log('Envoi d\'un message de test');
+                socket.emit('send_message', {
+                    type: 'system',
+                    content: 'Test de connexion réussi !'
+                });
+            }
+
+            // Faire défiler vers le bas au chargement initial
+            window.onload = function() {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // Tenter d'envoyer un message de test après un court délai
+                setTimeout(sendTestMessage, 2000);
+            };
+        });
+    </script><!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
