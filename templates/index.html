@@ -6,9 +6,21 @@
     <title>Oracle des Dimensions - Visualisation en Direct</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --bg-color: #0d1117;
+            --chat-bg: #161b22;
+            --accent-color: #58a6ff;
+            --oracle-message: #2d333b;
+            --user-message: #1a3b5c;
+            --header-bg: #21262d;
+            --text-color: #c9d1d9;
+            --secondary-text: #8b949e;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             padding: 0;
             display: flex;
@@ -17,16 +29,29 @@
         }
         
         header {
-            background-color: #4a76a8;
+            background-color: var(--header-bg);
             color: white;
             padding: 1rem;
             text-align: center;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header-icon {
+            margin-right: 1rem;
+            font-size: 1.8rem;
+            color: var(--accent-color);
         }
         
         .container {
             flex: 1;
             padding: 1rem;
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             width: 100%;
             overflow: hidden;
@@ -37,58 +62,89 @@
         .chat-container {
             flex: 1;
             overflow-y: auto;
-            background-color: white;
+            background-color: var(--chat-bg);
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             padding: 1rem;
             margin-bottom: 1rem;
+            border: 1px solid #30363d;
         }
         
         .message {
-            margin-bottom: 1rem;
-            padding: 0.75rem;
-            border-radius: 18px;
-            max-width: 70%;
-            animation: fadeIn 0.3s ease;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            animation: fadeIn 0.4s ease;
         }
         
-        .user-message {
-            background-color: #e3f2fd;
-            margin-left: auto;
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .oracle-avatar {
+            background: linear-gradient(45deg, #9932cc, #4b0082);
+        }
+        
+        .user-avatar {
+            background: linear-gradient(45deg, #1e90ff, #0000cd);
+        }
+        
+        .message-bubble {
+            max-width: calc(100% - 60px);
+            padding: 0.75rem 1rem;
+            border-radius: 18px;
+            position: relative;
+        }
+        
+        .user-message .message-bubble {
+            background-color: var(--user-message);
             border-bottom-right-radius: 4px;
         }
         
-        .system-message {
-            background-color: #eeeeee;
-            margin-right: auto;
+        .system-message .message-bubble {
+            background-color: var(--oracle-message);
             border-bottom-left-radius: 4px;
         }
         
         .info-message {
-            background-color: #fff8e1;
+            background-color: rgba(255, 248, 225, 0.1);
             margin: 0 auto;
             font-style: italic;
             border-radius: 8px;
             text-align: center;
+            padding: 0.5rem 1rem;
+            width: 80%;
         }
         
         .message-header {
             display: flex;
             justify-content: space-between;
             font-size: 0.8rem;
-            margin-bottom: 0.3rem;
-            color: #666;
+            margin-bottom: 0.4rem;
+            color: var(--secondary-text);
         }
         
         .message-content {
             word-break: break-word;
+            line-height: 1.4;
         }
         
         .status {
             padding: 0.5rem;
             text-align: center;
-            color: #666;
+            color: var(--secondary-text);
             font-size: 0.9rem;
+            background-color: var(--chat-bg);
+            border-radius: 8px;
+            border: 1px solid #30363d;
         }
         
         .connected {
@@ -99,21 +155,35 @@
             color: #e53935;
         }
         
+        .timestamp {
+            white-space: nowrap;
+            font-size: 0.75rem;
+            margin-left: 8px;
+        }
+        
+        .mystic-decor {
+            color: var(--accent-color);
+            margin: 0 4px;
+        }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
         @media (max-width: 600px) {
-            .message {
-                max-width: 85%;
+            .message-bubble {
+                max-width: calc(100% - 50px);
             }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1><i class="fas fa-comments"></i> Oracle des Dimensions - Visualisation en Direct</h1>
+        <div class="header-content">
+            <div class="header-icon"><i class="fas fa-eye"></i></div>
+            <h1>Oracle des Dimensions <span class="mystic-decor">✧</span> Visions Éternelles</h1>
+        </div>
     </header>
     
     <div class="container">
@@ -121,13 +191,25 @@
             <!-- Affichage de l'historique des messages -->
             {% if history %}
                 {% for message in history %}
-                    <div class="message {{ message.type }}-message">
-                        <div class="message-header">
-                            <span>{{ 'Utilisateur' if message.type == 'user' else ('Système' if message.type == 'system' else 'Info') }}</span>
-                            <span>{{ message.timestamp.strftime('%H:%M:%S') }}</span>
+                    {% if message.type == 'info' %}
+                        <div class="info-message">
+                            <div class="message-content">{{ message.content }}</div>
+                            <div class="timestamp">{{ message.timestamp.strftime('%d/%m/%Y %H:%M:%S') }}</div>
                         </div>
-                        <div class="message-content">{{ message.content }}</div>
-                    </div>
+                    {% else %}
+                        <div class="message {{ message.type }}-message">
+                            <div class="message-avatar {% if message.type == 'system' %}oracle-avatar{% else %}user-avatar{% endif %}">
+                                {% if message.type == 'system' %}<i class="fas fa-moon"></i>{% else %}<i class="fas fa-user"></i>{% endif %}
+                            </div>
+                            <div class="message-bubble">
+                                <div class="message-header">
+                                    <span>{% if message.type == 'system' %}L'Oracle{% else %}Voyageur{% endif %}</span>
+                                    <span class="timestamp">{{ message.timestamp.strftime('%d/%m/%Y %H:%M:%S') }}</span>
+                                </div>
+                                <div class="message-content">{{ message.content }}</div>
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endfor %}
             {% endif %}
             <!-- Les nouveaux messages seront ajoutés ici -->
@@ -135,7 +217,7 @@
         
         <div class="status" id="connectionStatus">
             <span class="disconnected">
-                <i class="fas fa-circle"></i> Déconnecté
+                <i class="fas fa-circle"></i> Connexion aux dimensions interrompue
             </span>
         </div>
     </div>
@@ -147,13 +229,29 @@
         const chatContainer = document.getElementById('chatContainer');
         const connectionStatus = document.getElementById('connectionStatus');
         
+        // Fonction pour formater la date
+        function formatDate(date) {
+            const now = new Date();
+            const messageDate = new Date(date);
+            
+            // Format: JJ/MM/YYYY HH:MM:SS
+            const day = messageDate.getDate().toString().padStart(2, '0');
+            const month = (messageDate.getMonth() + 1).toString().padStart(2, '0');
+            const year = messageDate.getFullYear();
+            const hours = messageDate.getHours().toString().padStart(2, '0');
+            const minutes = messageDate.getMinutes().toString().padStart(2, '0');
+            const seconds = messageDate.getSeconds().toString().padStart(2, '0');
+            
+            return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+        }
+        
         // Gestion de la connexion
         socket.on('connect', () => {
-            connectionStatus.innerHTML = '<span class="connected"><i class="fas fa-circle"></i> Connecté</span>';
+            connectionStatus.innerHTML = '<span class="connected"><i class="fas fa-circle"></i> Canal dimensionnel ouvert</span>';
         });
         
         socket.on('disconnect', () => {
-            connectionStatus.innerHTML = '<span class="disconnected"><i class="fas fa-circle"></i> Déconnecté</span>';
+            connectionStatus.innerHTML = '<span class="disconnected"><i class="fas fa-circle"></i> Connexion aux dimensions interrompue</span>';
         });
         
         // Réception des nouveaux messages
@@ -161,17 +259,31 @@
             // Créer un élément de message
             const messageDiv = document.createElement('div');
             
-            // Ajouter les classes appropriées selon le type de message
-            messageDiv.className = `message ${data.type}-message`;
-            
-            // Créer le contenu du message
-            messageDiv.innerHTML = `
-                <div class="message-header">
-                    <span>${data.type === 'user' ? 'Utilisateur' : (data.type === 'system' ? 'Oracle' : 'Info')}</span>
-                    <span>${data.timestamp}</span>
-                </div>
-                <div class="message-content">${data.content}</div>
-            `;
+            // Pour les messages de type info
+            if (data.type === 'info') {
+                messageDiv.className = 'info-message';
+                messageDiv.innerHTML = `
+                    <div class="message-content">${data.content}</div>
+                    <div class="timestamp">${formatDate(new Date())}</div>
+                `;
+            } else {
+                // Ajouter les classes appropriées selon le type de message
+                messageDiv.className = `message ${data.type}-message`;
+                
+                // Créer le contenu du message
+                messageDiv.innerHTML = `
+                    <div class="message-avatar ${data.type === 'system' ? 'oracle-avatar' : 'user-avatar'}">
+                        ${data.type === 'system' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-user"></i>'}
+                    </div>
+                    <div class="message-bubble">
+                        <div class="message-header">
+                            <span>${data.type === 'user' ? 'Voyageur' : (data.type === 'system' ? 'L\'Oracle' : 'Info')}</span>
+                            <span class="timestamp">${formatDate(new Date())}</span>
+                        </div>
+                        <div class="message-content">${data.content}</div>
+                    </div>
+                `;
+            }
             
             // Ajouter le message au conteneur de discussion
             chatContainer.appendChild(messageDiv);
