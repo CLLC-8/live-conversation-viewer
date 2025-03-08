@@ -1,10 +1,9 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualisation de Conversations en Direct</title>
+    <title>Oracle des Dimensions - Visualisation en Direct</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         body {
@@ -114,12 +113,24 @@
 </head>
 <body>
     <header>
-        <h1><i class="fas fa-comments"></i> Visualisation de Conversations en Direct</h1>
+        <h1><i class="fas fa-comments"></i> Oracle des Dimensions - Visualisation en Direct</h1>
     </header>
     
     <div class="container">
         <div class="chat-container" id="chatContainer">
-            <!-- Les messages seront insérés ici par JavaScript -->
+            <!-- Affichage de l'historique des messages -->
+            {% if history %}
+                {% for message in history %}
+                    <div class="message {{ message.type }}-message">
+                        <div class="message-header">
+                            <span>{{ 'Utilisateur' if message.type == 'user' else ('Système' if message.type == 'system' else 'Info') }}</span>
+                            <span>{{ message.timestamp.strftime('%H:%M:%S') }}</span>
+                        </div>
+                        <div class="message-content">{{ message.content }}</div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <!-- Les nouveaux messages seront ajoutés ici -->
         </div>
         
         <div class="status" id="connectionStatus">
@@ -156,7 +167,7 @@
             // Créer le contenu du message
             messageDiv.innerHTML = `
                 <div class="message-header">
-                    <span>${data.type === 'user' ? 'Utilisateur' : (data.type === 'system' ? 'Système' : 'Info')}</span>
+                    <span>${data.type === 'user' ? 'Utilisateur' : (data.type === 'system' ? 'Oracle' : 'Info')}</span>
                     <span>${data.timestamp}</span>
                 </div>
                 <div class="message-content">${data.content}</div>
@@ -168,6 +179,11 @@
             // Faire défiler vers le bas pour voir le nouveau message
             chatContainer.scrollTop = chatContainer.scrollHeight;
         });
+
+        // Faire défiler vers le bas au chargement initial
+        window.onload = function() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        };
     </script>
 </body>
 </html>
