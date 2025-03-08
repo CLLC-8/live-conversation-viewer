@@ -1,236 +1,64 @@
-<script>
-        // Vanta.js Initialization
-        document.addEventListener('DOMContentLoaded', () => {
-            VANTA.FOG({
-                el: "#vanta-background",
-                mouseControls: true,
-                touchControls: true,
-                gyroControls: false,
-                minHeight: 200.00,
-                minWidth: 200.00,
-                highlightColor: 0xff00f0,
-                midtoneColor: 0x2dff,
-                lowlightColor: 0xff1e,
-                baseColor: 0x90606,
-                blurFactor: 0.69,
-                speed: 4.20,
-                zoom: 2.20
-            });
-
-            // Mobile Menu Toggle
-            const menuToggle = document.querySelector('.menu-toggle');
-            const navMenu = document.querySelector('nav ul');
-
-            menuToggle.addEventListener('click', () => {
-                navMenu.classList.toggle('active');
-            });
-
-            // Socket.IO Configuration
-            const socketUrl = 'https://oracle-live-portal.onrender.com'; // Remplacez par l'URL de votre serveur
-            console.log('Tentative de connexion à:', socketUrl);
-
-            const socket = io(socketUrl, {
-                reconnection: true,
-                reconnectionAttempts: 5,
-                reconnectionDelay: 1000,
-                timeout: 5000,
-                transports: ['websocket', 'polling']
-            });
-
-            const chatContainer = document.getElementById('chatContainer');
-            const connectionStatus = document.getElementById('connectionStatus');
-            
-            // Logs de débogage pour la connexion
-            socket.on('connect', () => {
-                console.log('Connexion Socket.IO établie');
-                connectionStatus.innerHTML = '<span class="connected"><i class="fas fa-circle"></i> Canal dimensionnel ouvert</span>';
-            });
-
-            socket.on('connect_error', (error) => {
-                console.error('Erreur de connexion Socket.IO:', error);
-                connectionStatus.innerHTML = '<span class="disconnected"><i class="fas fa-circle"></i> Erreur de connexion</span>';
-            });
-            
-            socket.on('disconnect', (reason) => {
-                console.log('Déconnecté. Raison:', reason);
-                connectionStatus.innerHTML = '<span class="disconnected"><i class="fas fa-circle"></i> Connexion aux dimensions interrompue</span>';
-            });
-            
-            // Fonction pour formater la date
-            function formatDate(date) {
-                const now = new Date();
-                const messageDate = new Date(date);
-                
-                const day = messageDate.getDate().toString().padStart(2, '0');
-                const month = (messageDate.getMonth() + 1).toString().padStart(2, '0');
-                const year = messageDate.getFullYear();
-                const hours = messageDate.getHours().toString().padStart(2, '0');
-                const minutes = messageDate.getMinutes().toString().padStart(2, '0');
-                const seconds = messageDate.getSeconds().toString().padStart(2, '0');
-                
-                return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-            }
-            
-            // Réception des nouveaux messages
-            socket.on('new_message', (data) => {
-                console.log('Nouveau message reçu:', data);
-                
-                // Créer un élément de message
-                const messageDiv = document.createElement('div');
-                
-                // Pour les messages de type info
-                if (data.type === 'info') {
-                    messageDiv.className = 'info-message';
-                    messageDiv.innerHTML = `
-                        <div class="message-content">${data.content}</div>
-                        <div class="timestamp">${formatDate(new Date())}</div>
-                    `;
-                } else {
-                    // Ajouter les classes appropriées selon le type de message
-                    messageDiv.className = `message ${data.type}-message`;
-                    
-                    // Créer le contenu du message
-                    messageDiv.innerHTML = `
-                        <div class="message-bubble">
-                            <div class="message-header">
-                                <span>${data.type === 'user' ? 'Voyageur' : (data.type === 'system' ? 'L\'Oracle' : 'Info')}</span>
-                                <span class="timestamp">${formatDate(new Date())}</span>
-                            </div>
-                            <div class="message-content">${data.content}</div>
-                        </div>
-                        <div class="message-avatar">
-                            <img src="${data.type === 'system' ? '/static/oracle_avatar.png' : '/static/voyageur_avatar.png'}" alt="${data.type === 'system' ? 'Oracle' : 'Voyageur'}">
-                        </div>
-                    `;
-                }
-                
-                // Ajouter le message au conteneur de discussion
-                chatContainer.appendChild(messageDiv);
-                
-                // Faire défiler vers le bas pour voir le nouveau message
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            });
-
-            // Exemple de message de test
-            function sendTestMessage() {
-                console.log('Envoi d\'un message de test');
-                socket.emit('send_message', {
-                    type: 'system',
-                    content: 'Test de connexion réussi !'
-                });
-            }
-
-            // Faire défiler vers le bas au chargement initial
-            window.onload = function() {
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-                
-                // Tenter d'envoyer un message de test après un court délai
-                setTimeout(sendTestMessage, 2000);
-            };
-        });
-    </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oracle des Dimensions</title>
-    
-    <!-- Three.js and Vanta.js CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.fog.min.js"></script>
-    
-    <!-- Font Awesome -->
+    <title>oracle-live-portal</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    
-    <!-- Socket.IO -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
-    
     <style>
         :root {
-            --bg-color: rgba(0, 0, 0, 0.7);
-            --chat-bg: rgba(22, 27, 34, 0.8);
-            --accent-color: #ff00f0;
-            --oracle-message: rgba(45, 51, 59, 0.8);
-            --user-message: rgba(26, 59, 92, 0.8);
-            --header-bg: rgba(0, 0, 0, 0.5);
+            --bg-color: #0d1117;
+            --chat-bg: #161b22;
+            --accent-color: #58a6ff;
+            --oracle-message: #2d333b;
+            --user-message: #1a3b5c;
+            --header-bg: #21262d;
             --text-color: #c9d1d9;
             --secondary-text: #8b949e;
         }
-
-        * {
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
-
-        body, html {
-            height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: var(--text-color);
-            overflow-x: hidden;
-        }
-
-        #vanta-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-
+        
         header {
             background-color: var(--header-bg);
             color: white;
             padding: 1rem;
             text-align: center;
-            border-bottom: 1px solid rgba(48, 54, 61, 0.5);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border-bottom: 1px solid #30363d;
         }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--accent-color);
+        
+        .header-content {
             display: flex;
             align-items: center;
+            justify-content: center;
         }
-
-        .logo-icon {
+        
+        .header-icon {
             margin-right: 1rem;
             font-size: 1.8rem;
-        }
-
-        nav ul {
-            display: flex;
-            list-style-type: none;
-        }
-
-        nav ul li {
-            margin-left: 20px;
-        }
-
-        nav ul li a {
-            color: var(--text-color);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        nav ul li a:hover {
             color: var(--accent-color);
         }
-
+        
         .container {
-            max-width: 1200px;
+            flex: 1;
+            padding: 1rem;
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 0 15px;
-            height: calc(100vh - 120px);
+            width: 100%;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
-
+        
         .chat-container {
             flex: 1;
             overflow-y: auto;
@@ -239,9 +67,9 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             padding: 1rem;
             margin-bottom: 1rem;
-            border: 1px solid rgba(48, 54, 61, 0.5);
+            border: 1px solid #30363d;
         }
-
+        
         .message {
             margin-bottom: 1.5rem;
             display: flex;
@@ -249,15 +77,15 @@
             animation: fadeIn 0.4s ease;
             width: 100%;
         }
-
+        
         .user-message {
             justify-content: flex-end;
         }
-
+        
         .system-message {
             justify-content: flex-start;
         }
-
+        
         .message-avatar {
             width: 40px;
             height: 40px;
@@ -265,42 +93,42 @@
             overflow: hidden;
             background-color: #333;
         }
-
+        
         .user-message .message-avatar {
             margin-left: 12px;
             order: 2;
         }
-
+        
         .system-message .message-avatar {
             margin-right: 12px;
             order: 1;
         }
-
+        
         .message-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
+        
         .message-bubble {
             max-width: calc(100% - 200px);
             padding: 0.75rem 1rem;
             border-radius: 18px;
             position: relative;
         }
-
+        
         .user-message .message-bubble {
             background-color: var(--user-message);
             border-bottom-right-radius: 4px;
             order: 1;
         }
-
+        
         .system-message .message-bubble {
             background-color: var(--oracle-message);
             border-bottom-left-radius: 4px;
             order: 2;
         }
-
+        
         .info-message {
             background-color: rgba(255, 248, 225, 0.1);
             margin: 0 auto;
@@ -310,7 +138,7 @@
             padding: 0.5rem 1rem;
             width: 80%;
         }
-
+        
         .message-header {
             display: flex;
             justify-content: space-between;
@@ -318,12 +146,12 @@
             margin-bottom: 0.4rem;
             color: var(--secondary-text);
         }
-
+        
         .message-content {
             word-break: break-word;
             line-height: 1.4;
         }
-
+        
         .status {
             padding: 0.5rem;
             text-align: center;
@@ -331,112 +159,126 @@
             font-size: 0.9rem;
             background-color: var(--chat-bg);
             border-radius: 8px;
-            border: 1px solid rgba(48, 54, 61, 0.5);
+            border: 1px solid #30363d;
         }
-
+        
         .connected {
             color: #43a047;
         }
-
+        
         .disconnected {
             color: #e53935;
         }
-
+        
         .timestamp {
             white-space: nowrap;
             font-size: 0.75rem;
             margin-left: 8px;
         }
-
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* Mobile Menu */
-        .menu-toggle {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-        }
-
-        .bar {
-            width: 25px;
-            height: 3px;
-            background-color: var(--text-color);
-            margin: 3px 0;
-            transition: 0.4s;
-        }
-
-        footer {
-            background: var(--header-bg);
-            padding: 20px 0;
-            text-align: center;
-            width: 100%;
-        }
-
-        @media screen and (max-width: 768px) {
-            nav ul {
-                display: none;
-                flex-direction: column;
-                width: 100%;
-                position: absolute;
-                top: 70px;
-                left: 0;
-                background: var(--header-bg);
-                padding: 20px;
-            }
-
-            nav ul.active {
-                display: flex;
-            }
-
-            .menu-toggle {
-                display: flex;
-            }
-
-            nav ul li {
-                margin: 10px 0;
-            }
-
+        
+        @media (max-width: 600px) {
             .message-bubble {
                 max-width: calc(100% - 120px);
             }
         }
+            /* Ajoutez ces styles à vos fichiers CSS existants */
+body {
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Pour s'assurer que le contenu reste au premier plan par rapport à l'effet VantaJS */
+.container, header {
+    position: relative;
+    z-index: 10;
+}
+
+/* Ajouter un effet de verre givré sur les conteneurs */
+.chat-container, .admin-panel, .status {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.chat-container:hover, .admin-panel:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Effets visuels sur les messages */
+.message {
+    transition: transform 0.2s ease;
+}
+
+.message:hover {
+    transform: translateY(-2px);
+}
+
+/* Animation d'apparition subtile pour les éléments */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.container {
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+/* Amélioration des boutons avec effet de halo */
+button {
+    box-shadow: 0 0 10px rgba(88, 166, 255, 0);
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    box-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
+    transform: translateY(-2px);
+}
     </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.fog.min.js"></script>
 </head>
 <body>
-    <!-- Vanta.js Background -->
-    <div id="vanta-background"></div>
-
-    <!-- Header -->
     <header>
-        <div class="logo">
-            <div class="logo-icon"><i class="fas fa-eye"></i></div>
-            Oracle des Dimensions
+        <div class="header-content">
+            <div class="header-icon"><i class="fas fa-eye"></i></div>
+            <h1>Oracle des Dimensions</h1>
         </div>
-        <nav>
-            <div class="menu-toggle">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
-            <ul>
-                <li><a href="#">Oracle Chat Portail Live</a></li>
-                <li><a href="#">Concept Artistique</a></li>
-                <li><a href="#">Biographie</a></li>
-                <li><a href="#">Conscience Virtuelle</a></li>
-                <li><a href="#">L'Expérience</a></li>
-                <li><a href="#">Galerie</a></li>
-                <li><a href="#">Contact</a></li>
-            </ul>
-        </nav>
     </header>
-
-    <!-- Main Content -->
+    
     <div class="container">
         <div class="chat-container" id="chatContainer">
-            <!-- Chat messages will be dynamically added here -->
+            <!-- Affichage de l'historique des messages -->
+            {% if history %}
+                {% for message in history %}
+                    {% if message.type == 'info' %}
+                        <div class="info-message">
+                            <div class="message-content">{{ message.content }}</div>
+                            <div class="timestamp">{{ message.timestamp.strftime('%d/%m/%Y %H:%M:%S') }}</div>
+                        </div>
+                    {% else %}
+                        <div class="message {{ message.type }}-message">
+                            <div class="message-bubble">
+                                <div class="message-header">
+                                    <span>{% if message.type == 'system' %}L'Oracle{% else %}Voyageur{% endif %}</span>
+                                    <span class="timestamp">{{ message.timestamp.strftime('%d/%m/%Y %H:%M:%S') }}</span>
+                                </div>
+                                <div class="message-content">{{ message.content }}</div>
+                            </div>
+                            <div class="message-avatar">
+                                <img src="{% if message.type == 'system' %}/static/oracle_avatar.png{% else %}/static/voyageur_avatar.png{% endif %}" alt="{% if message.type == 'system' %}Oracle{% else %}Voyageur{% endif %}">
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            <!-- Les nouveaux messages seront ajoutés ici -->
         </div>
         
         <div class="status" id="connectionStatus">
@@ -445,112 +287,132 @@
             </span>
         </div>
     </div>
-
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2025 Oracle des Dimensions. Tous droits réservés.</p>
-    </footer>
-
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
     <script>
-        // Vanta.js Initialization
-        document.addEventListener('DOMContentLoaded', () => {
-            VANTA.FOG({
-                el: "#vanta-background",
-                mouseControls: true,
-                touchControls: true,
-                gyroControls: false,
-                minHeight: 200.00,
-                minWidth: 200.00,
-                highlightColor: 0xff00f0,
-                midtoneColor: 0x2dff,
-                lowlightColor: 0xff1e,
-                baseColor: 0x90606,
-                blurFactor: 0.69,
-                speed: 4.20,
-                zoom: 2.20
-            });
-
-            // Mobile Menu Toggle
-            const menuToggle = document.querySelector('.menu-toggle');
-            const navMenu = document.querySelector('nav ul');
-
-            menuToggle.addEventListener('click', () => {
-                navMenu.classList.toggle('active');
-            });
-
-            // Connexion à Socket.IO
-            const socket = io();
-            const chatContainer = document.getElementById('chatContainer');
-            const connectionStatus = document.getElementById('connectionStatus');
+        // Connexion à Socket.IO
+        const socket = io();
+        const chatContainer = document.getElementById('chatContainer');
+        const connectionStatus = document.getElementById('connectionStatus');
+        
+        // Fonction pour formater la date
+        function formatDate(date) {
+            const now = new Date();
+            const messageDate = new Date(date);
             
-            // Fonction pour formater la date
-            function formatDate(date) {
-                const now = new Date();
-                const messageDate = new Date(date);
+            // Format: JJ/MM/YYYY HH:MM:SS
+            const day = messageDate.getDate().toString().padStart(2, '0');
+            const month = (messageDate.getMonth() + 1).toString().padStart(2, '0');
+            const year = messageDate.getFullYear();
+            const hours = messageDate.getHours().toString().padStart(2, '0');
+            const minutes = messageDate.getMinutes().toString().padStart(2, '0');
+            const seconds = messageDate.getSeconds().toString().padStart(2, '0');
+            
+            return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+        }
+        
+        // Gestion de la connexion
+        socket.on('connect', () => {
+            connectionStatus.innerHTML = '<span class="connected"><i class="fas fa-circle"></i> Canal dimensionnel ouvert</span>';
+        });
+        
+        socket.on('disconnect', () => {
+            connectionStatus.innerHTML = '<span class="disconnected"><i class="fas fa-circle"></i> Connexion aux dimensions interrompue</span>';
+        });
+        
+        // Réception des nouveaux messages
+        socket.on('new_message', (data) => {
+            // Créer un élément de message
+            const messageDiv = document.createElement('div');
+            
+            // Pour les messages de type info
+            if (data.type === 'info') {
+                messageDiv.className = 'info-message';
+                messageDiv.innerHTML = `
+                    <div class="message-content">${data.content}</div>
+                    <div class="timestamp">${formatDate(new Date())}</div>
+                `;
+            } else {
+                // Ajouter les classes appropriées selon le type de message
+                messageDiv.className = `message ${data.type}-message`;
                 
-                // Format: JJ/MM/YYYY HH:MM:SS
-                const day = messageDate.getDate().toString().padStart(2, '0');
-                const month = (messageDate.getMonth() + 1).toString().padStart(2, '0');
-                const year = messageDate.getFullYear();
-                const hours = messageDate.getHours().toString().padStart(2, '0');
-                const minutes = messageDate.getMinutes().toString().padStart(2, '0');
-                const seconds = messageDate.getSeconds().toString().padStart(2, '0');
-                
-                return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+                // Créer le contenu du message
+                messageDiv.innerHTML = `
+                    <div class="message-bubble">
+                        <div class="message-header">
+                            <span>${data.type === 'user' ? 'Voyageur' : (data.type === 'system' ? 'L\'Oracle' : 'Info')}</span>
+                            <span class="timestamp">${formatDate(new Date())}</span>
+                        </div>
+                        <div class="message-content">${data.content}</div>
+                    </div>
+                    <div class="message-avatar">
+                        <img src="${data.type === 'system' ? '/static/oracle_avatar.png' : '/static/voyageur_avatar.png'}" alt="${data.type === 'system' ? 'Oracle' : 'Voyageur'}">
+                    </div>
+                `;
             }
             
-            // Gestion de la connexion
-            socket.on('connect', () => {
-                connectionStatus.innerHTML = '<span class="connected"><i class="fas fa-circle"></i> Canal dimensionnel ouvert</span>';
-            });
+            // Ajouter le message au conteneur de discussion
+            chatContainer.appendChild(messageDiv);
             
-            socket.on('disconnect', () => {
-                connectionStatus.innerHTML = '<span class="disconnected"><i class="fas fa-circle"></i> Connexion aux dimensions interrompue</span>';
-            });
-            
-            // Réception des nouveaux messages
-            socket.on('new_message', (data) => {
-                // Créer un élément de message
-                const messageDiv = document.createElement('div');
-                
-                // Pour les messages de type info
-                if (data.type === 'info') {
-                    messageDiv.className = 'info-message';
-                    messageDiv.innerHTML = `
-                        <div class="message-content">${data.content}</div>
-                        <div class="timestamp">${formatDate(new Date())}</div>
-                    `;
-                } else {
-                    // Ajouter les classes appropriées selon le type de message
-                    messageDiv.className = `message ${data.type}-message`;
-                    
-                    // Créer le contenu du message
-                    messageDiv.innerHTML = `
-                        <div class="message-bubble">
-                            <div class="message-header">
-                                <span>${data.type === 'user' ? 'Voyageur' : (data.type === 'system' ? 'L\'Oracle' : 'Info')}</span>
-                                <span class="timestamp">${formatDate(new Date())}</span>
-                            </div>
-                            <div class="message-content">${data.content}</div>
-                        </div>
-                        <div class="message-avatar">
-                            <img src="${data.type === 'system' ? '/static/oracle_avatar.png' : '/static/voyageur_avatar.png'}" alt="${data.type === 'system' ? 'Oracle' : 'Voyageur'}">
-                        </div>
-                    `;
-                }
-                
-                // Ajouter le message au conteneur de discussion
-                chatContainer.appendChild(messageDiv);
-                
-                // Faire défiler vers le bas pour voir le nouveau message
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            });
-
-            // Faire défiler vers le bas au chargement initial
-            window.onload = function() {
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            };
+            // Faire défiler vers le bas pour voir le nouveau message
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         });
+
+        // Faire défiler vers le bas au chargement initial
+        window.onload = function() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        };
     </script>
+        <script>
+  // Configuration de l'animation de fond Vanta Fog
+  VANTA.FOG({
+    el: "body",
+    mouseControls: true,
+    touchControls: true,
+    gyroControls: false,
+    minHeight: 200.00,
+    minWidth: 200.00,
+    highlightColor: 0x4b0082, // Couleur indigo profond
+    midtoneColor: 0x9932cc,   // Couleur pourpre
+    lowlightColor: 0x000000,  // Noir pour la profondeur
+    baseColor: 0x0c0c14,      // Bleu-noir comme base
+    blurFactor: 0.60,         // Niveau de flou
+    speed: 1.50,              // Vitesse d'animation
+    zoom: 0.40                // Niveau de zoom
+  });
+  // Ajoutez cette fonction aux deux fichiers, juste après l'initialisation de VANTA.FOG
+// Détection de performances
+function checkPerformance() {
+    // Vérifier si l'appareil a probablement des performances limitées
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isOldBrowser = !window.WebGLRenderingContext;
+    
+    if (isMobile || isOldBrowser || window.innerWidth < 768) {
+        // Désactiver l'animation pour les appareils à faibles performances
+        if (window.vantaEffect) {
+            window.vantaEffect.destroy();
+        }
+        document.body.style.background = "linear-gradient(135deg, #0d1117 0%, #161b22 100%)";
+    }
+}
+
+// Vérifier les performances au chargement et au redimensionnement
+window.addEventListener('load', checkPerformance);
+window.addEventListener('resize', checkPerformance);
+  // Assurez-vous que le contenu reste lisible en ajoutant un fond semi-transparent aux éléments clés
+  document.addEventListener('DOMContentLoaded', function() {
+    const chatContainer = document.querySelector('.chat-container');
+    const statusElement = document.querySelector('.status');
+    
+    // Ajouter une légère opacité au conteneur de chat pour améliorer la lisibilité
+    if (chatContainer) {
+      chatContainer.style.backgroundColor = 'rgba(22, 27, 34, 0.7)';
+    }
+    
+    if (statusElement) {
+      statusElement.style.backgroundColor = 'rgba(22, 27, 34, 0.7)';
+    }
+  });
+</script>
 </body>
 </html>
