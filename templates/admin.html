@@ -145,6 +145,24 @@
             display: none;
         }
         
+        .error-message {
+            background-color: rgba(248, 81, 73, 0.1);
+            border: 1px solid var(--danger);
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        
+        .debug-info {
+            background-color: #1c2129;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border: 1px solid #30363d;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
         .message-editor {
             display: none;
             margin-bottom: 1.5rem;
@@ -168,7 +186,7 @@
             color: var(--secondary-text);
         }
         
-        .form-group textarea, .form-group input {
+        .form-group textarea, .form-group input, .form-group select {
             width: 100%;
             padding: 0.75rem;
             border-radius: 4px;
@@ -190,20 +208,26 @@
             justify-content: flex-end;
         }
         
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 1.5rem;
-            gap: 0.5rem;
+        .nav-links {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .nav-links a {
+            color: var(--accent-color);
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
         }
         
-        .pagination button {
-            background-color: var(--chat-bg);
-            border: 1px solid #30363d;
-        }
-        
-        .pagination button.active {
-            background-color: var(--accent-color);
+        .no-messages {
+            text-align: center;
+            padding: 2rem;
+            color: var(--secondary-text);
         }
         
         @media (max-width: 768px) {
@@ -219,14 +243,292 @@
                 max-width: 200px;
             }
         }
-
-        .nav-links {
-            margin-top: 1rem;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .nav-links a {
-            color: var(--accent-color);
-            text-decoration: none;
-            margin: 0 1
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="header-icon"><i class="fas fa-cogs"></i></div>
+            <h1>Administration - Oracle des Dimensions</h1>
+        </div>
+    </header>
+    
+    <div class="nav-links">
+        <a href="/">Retour au chat</a>
+        <a href="/admin">Administration</a>
+        <a href="/export">Exporter les données</a>
+    </div>
+    
+    <div class="container">
+        {% if debug_info %}
+        <div class="debug-info">
+            {{ debug_info }}
+        </div>
+        {% endif %}
+        
+        {% if error %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i> {{ error }}
+        </div>
+        {% endif %}
+        
+        <div class="admin-panel">
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i> Opération réussie !
+            </div>
+            
+            <div class="actions">
+                <button id="refreshBtn"><i class="fas fa-sync-alt"></i> Rafraîchir</button>
+                <button id="clearAllBtn" class="danger"><i class="fas fa-trash-alt"></i> Supprimer toutes les conversations</button>
+            </div>
+            
+            <div class="message-editor" id="messageEditor">
+                <h3>Modifier le message</h3>
+                <form id="editForm">
+                    <input type="hidden" id="editMessageId">
+                    
+                    <div class="form-group">
+                        <label for="editType">Type :</label>
+                        <select id="editType" required>
+                            <option value="user">Voyageur</option>
+                            <option value="system">Oracle</option>
+                            <option value="info">Info</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editTimestamp">Date et heure :</label>
+                        <input type="text" id="editTimestamp" disabled>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editContent">Contenu :</label>
+                        <textarea id="editContent" required></textarea>
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <button type="button" id="cancelBtn"><i class="fas fa-times"></i> Annuler</button>
+                        <button type="submit"><i class="fas fa-save"></i> Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+            
+            {% if messages %}
+            <table>
+                <thead>
+                    <tr>
+                        {% if messages[0] and 'id' in messages[0] %}
+                        <th>ID</th>
+                        {% endif %}
+                        <th>Date et heure</th>
+                        <th>Type</th>
+                        <th>Contenu</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="messagesTable">
+                    {% for message in messages %}
+                    <tr data-id="{{ message.id if 'id' in message else loop.index }}">
+                        {% if messages[0] and 'id' in messages[0] %}
+                        <td>{{ message.id }}</td>
+                        {% endif %}
+                        <td>{{ message.timestamp.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+                        <td>{{ 'Voyageur' if message.type == 'user' else ('Oracle' if message.type == 'system' else 'Info') }}</td>
+                        <td class="message-content">{{ message.content }}</td>
+                        <td class="actions-cell">
+                            <button class="btn-small edit-btn" 
+                                data-id="{{ message.id if 'id' in message else loop.index }}" 
+                                data-type="{{ message.type }}" 
+                                data-timestamp="{{ message.timestamp.strftime('%d/%m/%Y %H:%M:%S') }}" 
+                                data-content="{{ message.content }}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-small danger delete-btn" 
+                                data-id="{{ message.id if 'id' in message else loop.index }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="no-messages">
+                <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <p>Aucun message trouvé dans la base de données.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion des boutons d'édition
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const type = this.getAttribute('data-type');
+                    const timestamp = this.getAttribute('data-timestamp');
+                    const content = this.getAttribute('data-content');
+                    
+                    document.getElementById('editMessageId').value = id;
+                    document.getElementById('editType').value = type;
+                    document.getElementById('editTimestamp').value = timestamp;
+                    document.getElementById('editContent').value = content;
+                    
+                    document.getElementById('messageEditor').style.display = 'block';
+                    document.getElementById('editContent').focus();
+                    
+                    // Faire défiler jusqu'à l'éditeur
+                    document.getElementById('messageEditor').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+            
+            // Gestion du bouton d'annulation d'édition
+            document.getElementById('cancelBtn').addEventListener('click', function() {
+                document.getElementById('messageEditor').style.display = 'none';
+                document.getElementById('editForm').reset();
+            });
+            
+            // Gestion du formulaire d'édition
+            document.getElementById('editForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const id = document.getElementById('editMessageId').value;
+                const type = document.getElementById('editType').value;
+                const content = document.getElementById('editContent').value;
+                
+                fetch(`/admin/update/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type: type,
+                        content: content
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Mise à jour de l'affichage
+                        const row = document.querySelector(`tr[data-id="${id}"]`);
+                        const typeDisplay = type === 'user' ? 'Voyageur' : (type === 'system' ? 'Oracle' : 'Info');
+                        
+                        // Mettre à jour la cellule du type
+                        row.querySelectorAll('td')[document.querySelector('th:nth-child(3)') ? 2 : 1].textContent = typeDisplay;
+                        
+                        // Mettre à jour la cellule du contenu
+                        row.querySelectorAll('td')[document.querySelector('th:nth-child(4)') ? 3 : 2].textContent = content;
+                        
+                        // Mise à jour du bouton d'édition
+                        const editBtn = row.querySelector('.edit-btn');
+                        editBtn.setAttribute('data-type', type);
+                        editBtn.setAttribute('data-content', content);
+                        
+                        // Afficher le message de succès
+                        const successMessage = document.getElementById('successMessage');
+                        successMessage.style.display = 'block';
+                        setTimeout(() => {
+                            successMessage.style.display = 'none';
+                        }, 3000);
+                        
+                        // Fermer l'éditeur
+                        document.getElementById('messageEditor').style.display = 'none';
+                        document.getElementById('editForm').reset();
+                    } else {
+                        alert('Erreur: ' + (data.message || 'Une erreur est survenue'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur de connexion au serveur');
+                });
+            });
+            
+            // Gestion des boutons de suppression
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (confirm('Êtes-vous sûr de vouloir supprimer ce message ?')) {
+                        const id = this.getAttribute('data-id');
+                        
+                        fetch(`/admin/delete/${id}`, {
+                            method: 'POST',
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                // Supprimer la ligne du tableau
+                                const row = document.querySelector(`tr[data-id="${id}"]`);
+                                row.remove();
+                                
+                                // Afficher le message de succès
+                                const successMessage = document.getElementById('successMessage');
+                                successMessage.style.display = 'block';
+                                setTimeout(() => {
+                                    successMessage.style.display = 'none';
+                                }, 3000);
+                                
+                                // Si c'était le dernier message, afficher "Aucun message"
+                                if (document.querySelectorAll('#messagesTable tr').length === 0) {
+                                    document.querySelector('table').outerHTML = `
+                                        <div class="no-messages">
+                                            <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                            <p>Aucun message trouvé dans la base de données.</p>
+                                        </div>
+                                    `;
+                                }
+                            } else {
+                                alert('Erreur: ' + (data.message || 'Une erreur est survenue'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erreur:', error);
+                            alert('Erreur de connexion au serveur');
+                        });
+                    }
+                });
+            });
+            
+            // Gestion du bouton de rafraîchissement
+            document.getElementById('refreshBtn').addEventListener('click', function() {
+                window.location.reload();
+            });
+            
+            // Gestion du bouton de suppression de toutes les conversations
+            document.getElementById('clearAllBtn').addEventListener('click', function() {
+                if (confirm('Êtes-vous sûr de vouloir supprimer TOUTES les conversations ? Cette action est irréversible.')) {
+                    fetch('/admin/clear_all', {
+                        method: 'POST',
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Remplacer le tableau par "Aucun message"
+                            document.querySelector('table').outerHTML = `
+                                <div class="no-messages">
+                                    <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                    <p>Aucun message trouvé dans la base de données.</p>
+                                </div>
+                            `;
+                            
+                            // Afficher le message de succès
+                            const successMessage = document.getElementById('successMessage');
+                            successMessage.style.display = 'block';
+                            setTimeout(() => {
+                                successMessage.style.display = 'none';
+                            }, 3000);
+                        } else {
+                            alert('Erreur: ' + (data.message || 'Une erreur est survenue'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur:', error);
+                        alert('Erreur de connexion au serveur');
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
