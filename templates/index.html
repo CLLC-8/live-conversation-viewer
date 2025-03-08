@@ -9,10 +9,10 @@
         :root {
             --bg-color: #0d1117;
             --chat-bg: #161b22;
-            --accent-color: #58a6ff;
+            --accent-color: #fd84b3;
             --oracle-message: #2d333b;
             --user-message: #1a3b5c;
-            --header-bg: #21262d;
+            --header-bg: rgba(0, 0, 0, 0.5);
             --text-color: #c9d1d9;
             --secondary-text: #8b949e;
         }
@@ -26,28 +26,110 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
+            position: relative;
+            overflow-x: hidden;
         }
         
+        /* Header et navigation */
         header {
             background-color: var(--header-bg);
             color: white;
-            padding: 1rem;
-            text-align: center;
-            border-bottom: 1px solid #30363d;
+            padding: 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 100;
         }
         
-        .header-content {
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .logo {
             display: flex;
             align-items: center;
-            justify-content: center;
+            text-decoration: none;
+            color: white;
         }
         
-        .header-icon {
-            margin-right: 1rem;
-            font-size: 1.8rem;
+        .logo-icon {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
             color: var(--accent-color);
         }
         
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .nav-item {
+            margin: 0 0.5rem;
+        }
+        
+        .nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: var(--accent-color);
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-left: 1rem;
+        }
+        
+        .social-icon {
+            color: var(--secondary-text);
+            font-size: 1.2rem;
+            transition: color 0.2s ease;
+        }
+        
+        .social-icon:hover {
+            color: var(--accent-color);
+        }
+        
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            cursor: pointer;
+            z-index: 110;
+        }
+        
+        .hamburger span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: var(--text-color);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Container principal */
         .container {
             flex: 1;
             padding: 1rem;
@@ -57,25 +139,42 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            position: relative;
+            z-index: 10;
+            animation: fadeInUp 0.8s ease forwards;
         }
         
+        /* Chat container */
         .chat-container {
             flex: 1;
             overflow-y: auto;
-            background-color: var(--chat-bg);
+            background-color: rgba(22, 27, 34, 0.7);
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
             padding: 1rem;
             margin-bottom: 1rem;
-            border: 1px solid #30363d;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
         
+        .chat-container:hover {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Messages */
         .message {
             margin-bottom: 1.5rem;
             display: flex;
             align-items: flex-start;
             animation: fadeIn 0.4s ease;
             width: 100%;
+            transition: transform 0.2s ease;
+        }
+        
+        .message:hover {
+            transform: translateY(-2px);
         }
         
         .user-message {
@@ -152,14 +251,18 @@
             line-height: 1.4;
         }
         
+        /* Status */
         .status {
             padding: 0.5rem;
             text-align: center;
             color: var(--secondary-text);
             font-size: 0.9rem;
-            background-color: var(--chat-bg);
+            background-color: rgba(22, 27, 34, 0.7);
             border-radius: 8px;
-            border: 1px solid #30363d;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
         }
         
         .connected {
@@ -176,81 +279,155 @@
             margin-left: 8px;
         }
         
+        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Media queries */
+        @media (max-width: 1024px) {
+            .nav-link {
+                padding: 0.5rem;
+                font-size: 0.85rem;
+            }
+        }
+        
+        @media (max-width: 860px) {
+            .hamburger {
+                display: flex;
+            }
+            
+            .nav-menu {
+                position: fixed;
+                top: 0;
+                right: -300px;
+                height: 100vh;
+                width: 300px;
+                flex-direction: column;
+                background-color: var(--header-bg);
+                padding: 4rem 1.5rem 2rem;
+                transition: right 0.3s ease;
+                box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+                z-index: 100;
+            }
+            
+            .nav-menu.active {
+                right: 0;
+            }
+            
+            .nav-item {
+                margin: 0.5rem 0;
+                width: 100%;
+            }
+            
+            .nav-link {
+                display: block;
+                width: 100%;
+                text-align: left;
+                padding: 0.75rem 1rem;
+            }
+            
+            .social-icons {
+                margin: 1.5rem 0 0 0;
+                justify-content: center;
+            }
+            
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 90;
+                display: none;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+            
+            .hamburger.active span:nth-child(1) {
+                transform: translateY(9px) rotate(45deg);
+            }
+            
+            .hamburger.active span:nth-child(2) {
+                opacity: 0;
+            }
+            
+            .hamburger.active span:nth-child(3) {
+                transform: translateY(-9px) rotate(-45deg);
+            }
         }
         
         @media (max-width: 600px) {
             .message-bubble {
                 max-width: calc(100% - 120px);
             }
+            
+            .social-icons {
+                gap: 1.5rem;
+            }
         }
-            /* Ajoutez ces styles à vos fichiers CSS existants */
-body {
-    position: relative;
-    overflow-x: hidden;
-}
-
-/* Pour s'assurer que le contenu reste au premier plan par rapport à l'effet VantaJS */
-.container, header {
-    position: relative;
-    z-index: 10;
-}
-
-/* Ajouter un effet de verre givré sur les conteneurs */
-.chat-container, .admin-panel, .status {
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-}
-
-.chat-container:hover, .admin-panel:hover {
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-
-/* Effets visuels sur les messages */
-.message {
-    transition: transform 0.2s ease;
-}
-
-.message:hover {
-    transform: translateY(-2px);
-}
-
-/* Animation d'apparition subtile pour les éléments */
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.container {
-    animation: fadeInUp 0.8s ease forwards;
-}
-
-/* Amélioration des boutons avec effet de halo */
-button {
-    box-shadow: 0 0 10px rgba(88, 166, 255, 0);
-    transition: all 0.3s ease;
-}
-
-button:hover {
-    box-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
-    transform: translateY(-2px);
-}
     </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.fog.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.fog.min.js"></script>
 </head>
 <body>
     <header>
-        <div class="header-content">
-            <div class="header-icon"><i class="fas fa-eye"></i></div>
-            <h1>Oracle des Dimensions</h1>
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <div class="logo-icon"><i class="fas fa-eye"></i></div>
+                <div class="logo-text">L'Oracle</div>
+            </a>
+            
+            <div class="hamburger" id="hamburger-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li class="nav-item">
+                    <a href="/" class="nav-link active">Oracle Chat Portail Live</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/concept" class="nav-link">Concept</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/conscience" class="nav-link">Conscience Virtuelle</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/experience" class="nav-link">L'Expérience</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/galerie" class="nav-link">Galerie Multimédia</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/bio" class="nav-link">Bio</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/contact" class="nav-link">Contact</a>
+                </li>
+                <div class="social-icons">
+                    <a href="https://instagram.com/oracle_dimensions/" target="_blank" class="social-icon">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="social-icon share-btn">
+                        <i class="fas fa-share-alt"></i>
+                    </a>
+                </div>
+            </ul>
         </div>
     </header>
+    
+    <div class="overlay" id="overlay"></div>
     
     <div class="container">
         <div class="chat-container" id="chatContainer">
@@ -290,6 +467,53 @@ button:hover {
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
     <script>
+        // Menu mobile toggle
+        const hamburger = document.getElementById('hamburger-menu');
+        const navMenu = document.getElementById('nav-menu');
+        const overlay = document.getElementById('overlay');
+        
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
+        });
+        
+        overlay.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+        
+        // Share button functionality
+        const shareButton = document.querySelector('.share-btn');
+        shareButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Oracle des Dimensions',
+                        text: 'Découvrez l\'Oracle des Dimensions - Une expérience unique de consultation divinatoire via l\'intelligence artificielle',
+                        url: window.location.href
+                    });
+                } catch (err) {
+                    console.error('Erreur lors du partage:', err);
+                }
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                const tempInput = document.createElement('input');
+                document.body.appendChild(tempInput);
+                tempInput.value = window.location.href;
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                
+                alert('Lien copié dans le presse-papier!');
+            }
+        });
+        
         // Connexion à Socket.IO
         const socket = io();
         const chatContainer = document.getElementById('chatContainer');
@@ -362,58 +586,42 @@ button:hover {
         window.onload = function() {
             chatContainer.scrollTop = chatContainer.scrollHeight;
         };
-    </script>
-        <script>
-  // Configuration de l'animation de fond Vanta Fog
-  VANTA.FOG({
-    el: "body",
-    mouseControls: true,
-    touchControls: true,
-    gyroControls: false,
-    minHeight: 200.00,
-    minWidth: 200.00,
-    highlightColor: 0xff00e0, // Couleur indigo profond
-    midtoneColor: 0x87ff,   // Couleur pourpre
-    lowlightColor: 0x000000,  // Noir pour la profondeur
-    baseColor: 0x0,      // Bleu-noir comme base
-    blurFactor: 0.63,         // Niveau de flou
-    speed: 2.70,              // Vitesse d'animation
-    zoom: 0.60                // Niveau de zoom
-
-  });
-  // Ajoutez cette fonction aux deux fichiers, juste après l'initialisation de VANTA.FOG
-// Détection de performances
-function checkPerformance() {
-    // Vérifier si l'appareil a probablement des performances limitées
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const isOldBrowser = !window.WebGLRenderingContext;
-    
-    if (isMobile || isOldBrowser || window.innerWidth < 768) {
-        // Désactiver l'animation pour les appareils à faibles performances
-        if (window.vantaEffect) {
-            window.vantaEffect.destroy();
+        
+        // Configuration de l'animation de fond Vanta Fog
+        VANTA.FOG({
+            el: "body",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            highlightColor: 0xff00e0, // Couleur indigo profond
+            midtoneColor: 0x87ff,   // Couleur pourpre
+            lowlightColor: 0x000000,  // Noir pour la profondeur
+            baseColor: 0x0,      // Bleu-noir comme base
+            blurFactor: 0.63,         // Niveau de flou
+            speed: 2.70,              // Vitesse d'animation
+            zoom: 0.60                // Niveau de zoom
+        });
+        
+        // Détection de performances
+        function checkPerformance() {
+            // Vérifier si l'appareil a probablement des performances limitées
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const isOldBrowser = !window.WebGLRenderingContext;
+            
+            if (isMobile || isOldBrowser || window.innerWidth < 768) {
+                // Désactiver l'animation pour les appareils à faibles performances
+                if (window.vantaEffect) {
+                    window.vantaEffect.destroy();
+                }
+                document.body.style.background = "linear-gradient(135deg, #0d1117 0%, #161b22 100%)";
+            }
         }
-        document.body.style.background = "linear-gradient(135deg, #0d1117 0%, #161b22 100%)";
-    }
-}
 
-// Vérifier les performances au chargement et au redimensionnement
-window.addEventListener('load', checkPerformance);
-window.addEventListener('resize', checkPerformance);
-  // Assurez-vous que le contenu reste lisible en ajoutant un fond semi-transparent aux éléments clés
-  document.addEventListener('DOMContentLoaded', function() {
-    const chatContainer = document.querySelector('.chat-container');
-    const statusElement = document.querySelector('.status');
-    
-    // Ajouter une légère opacité au conteneur de chat pour améliorer la lisibilité
-    if (chatContainer) {
-      chatContainer.style.backgroundColor = 'rgba(22, 27, 34, 0.7)';
-    }
-    
-    if (statusElement) {
-      statusElement.style.backgroundColor = 'rgba(22, 27, 34, 0.7)';
-    }
-  });
-</script>
+        // Vérifier les performances au chargement et au redimensionnement
+        window.addEventListener('load', checkPerformance);
+        window.addEventListener('resize', checkPerformance);
+    </script>
 </body>
 </html>
