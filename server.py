@@ -8,6 +8,7 @@ import time
 import psycopg2
 from psycopg2.extras import DictCursor
 from datetime import datetime
+import traceback
 
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = 'votre_clé_secrète'
@@ -147,22 +148,83 @@ if __name__ == '__main__':
 
 
 
+# Routes d'administration
 @app.route('/admin')
 def admin():
+    debug_info = ""
     try:
+        # Vérifier que la connexion à la base de données fonctionne
         conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor(cursor_factory=DictCursor)
+        cur = conn.cursor()
         
-        cur.execute(
-            "SELECT id, timestamp, type, content FROM messages ORDER BY timestamp DESC"
-        )
-        messages = [dict(row) for row in cur.fetchall()]
+        # Vérifier si la table messages existe
+        cur.execute("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'messages')")
+        table_exists = cur.fetchone()[0]
+        debug_info += f"Table 'messages' existe: {table_exists}\n"
+        
+        if not table_exists:
+            # Créer la table si elle n'existe pas
+            cur.execute('''
+            CREATE TABLE IF NOT EXISTS messages (
+                id SERIAL PRIMARY KEY,
+                timestamp TIMESTAMP,
+                type VARCHAR(50),
+                content TEXT
+            )
+            ''')
+            conn.commit()
+            debug_info += "Table 'messages' créée\n"
+            
+            # Vérifier à nouveau
+            cur.execute("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'messages')")
+            table_exists = cur.fetchone()[0]
+            debug_info += f"Table 'messages' existe après création: {table_exists}\n"
+            
+            # Si la table n'existe toujours pas
+            if not table_exists:
+                conn.close()
+                return render_template('admin.html', messages=[], error="Impossible de créer la table 'messages'", debug_info=debug_info)
+        
+        # Vérifier les colonnes de la table
+        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'messages'")
+        columns = [col[0] for col in cur.fetchall()]
+        debug_info += f"Colonnes dans la table 'messages': {', '.join(columns)}\n"
+        
+        # Si la structure est correcte, récupérer les messages
+        # Adapter la requête en fonction des colonnes disponibles
+        if 'id' in columns:
+            query = "SELECT id, timestamp, type, content FROM messages ORDER BY timestamp DESC"
+        else:
+            query = "SELECT timestamp, type, content FROM messages ORDER BY timestamp DESC"
+        
+        debug_info += f"Requête utilisée: {query}\n"
+        
+        cur.execute(query)
+        
+        # Utiliser DictCursor pour les résultats
+        messages = []
+        column_names = [desc[0] for desc in cur.description]
+        rows = cur.fetchall()
+        
+        for row in rows:
+            message = {}
+            for i, col_name in enumerate(column_names):
+                message[col_name] = row[i]
+            messages.append(message)
+        
+        debug_info += f"Nombre de messages récupérés: {len(messages)}\n"
+        
+        # S'il y a des messages, afficher un exemple
+        if messages and len(messages) > 0:
+            debug_info += f"Exemple de message: {str(messages[0])}\n"
         
         conn.close()
-        return render_template('admin.html', messages=messages)
+        return render_template('admin.html', messages=messages, debug_info=debug_info)
+        
     except Exception as e:
-        print(f"Erreur lors de l'accès à l'administration: {e}")
-        return "Erreur lors du chargement de la page d'administration", 500
+        error_traceback = traceback.format_exc()
+        debug_info += f"Exception: {str(e)}\n\nTraceback:\n{error_traceback}"
+        return render_template('admin.html', messages=[], error=f"Erreur: {str(e)}", debug_info=debug_info)
 
 @app.route('/admin/delete/<int:message_id>', methods=['POST'])
 def delete_message(message_id):
@@ -170,32 +232,52 @@ def delete_message(message_id):
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
         
-        cur.execute(
-            "DELETE FROM messages WHERE id = %s",
-            (message_id,)
-        )
+        # Vérifier si le message existe
+        cur.execute("SELECT EXISTS(SELECT 1 FROM messages WHERE id = %s)", (message_id,))
+        message_exists = cur.fetchone()[0]
         
+        if not message_exists:
+            conn.close()
+            return jsonify({"status": "error", "message": f"Message avec ID {message_id} introuvable"}), 404
+        
+        # Supprimer le message
+        cur.execute("DELETE FROM messages WHERE id = %s", (message_id,))
         conn.commit()
         conn.close()
         
         return jsonify({"status": "success"}), 200
     except Exception as e:
-        print(f"Erreur lors de la suppression du message: {e}")
+        print(f"Erreur lors de la suppression du message {message_id}: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/admin/update/<int:message_id>', methods=['POST'])
 def update_message(message_id):
     try:
         data = request.json
-        type = data.get('type')
+        if not data:
+            return jsonify({"status": "error", "message": "Aucune donnée reçue"}), 400
+            
+        type_value = data.get('type')
         content = data.get('content')
+        
+        if not type_value or not content:
+            return jsonify({"status": "error", "message": "Type et contenu requis"}), 400
         
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
         
+        # Vérifier si le message existe
+        cur.execute("SELECT EXISTS(SELECT 1 FROM messages WHERE id = %s)", (message_id,))
+        message_exists = cur.fetchone()[0]
+        
+        if not message_exists:
+            conn.close()
+            return jsonify({"status": "error", "message": f"Message avec ID {message_id} introuvable"}), 404
+        
+        # Mettre à jour le message
         cur.execute(
             "UPDATE messages SET type = %s, content = %s WHERE id = %s",
-            (type, content, message_id)
+            (type_value, content, message_id)
         )
         
         conn.commit()
@@ -203,7 +285,7 @@ def update_message(message_id):
         
         return jsonify({"status": "success"}), 200
     except Exception as e:
-        print(f"Erreur lors de la mise à jour du message: {e}")
+        print(f"Erreur lors de la mise à jour du message {message_id}: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/admin/clear_all', methods=['POST'])
@@ -213,11 +295,12 @@ def clear_all_messages():
         cur = conn.cursor()
         
         cur.execute("DELETE FROM messages")
+        rows_deleted = cur.rowcount
         
         conn.commit()
         conn.close()
         
-        return jsonify({"status": "success"}), 200
+        return jsonify({"status": "success", "deleted": rows_deleted}), 200
     except Exception as e:
         print(f"Erreur lors de la suppression de tous les messages: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -228,7 +311,17 @@ def export_data():
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
         
-        cur.execute("SELECT id, timestamp, type, content FROM messages ORDER BY timestamp")
+        # Déterminer les colonnes disponibles
+        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'messages'")
+        columns = [col[0] for col in cur.fetchall()]
+        
+        # Adapter la requête selon les colonnes disponibles
+        if 'id' in columns:
+            select_clause = "id, timestamp, type, content"
+        else:
+            select_clause = "timestamp, type, content"
+        
+        cur.execute(f"SELECT {select_clause} FROM messages ORDER BY timestamp")
         rows = cur.fetchall()
         
         conn.close()
@@ -236,8 +329,12 @@ def export_data():
         # Créer un CSV
         output = io.StringIO()
         writer = csv.writer(output)
-        writer.writerow(['ID', 'Timestamp', 'Type', 'Content'])  # En-têtes
         
+        # Écrire les en-têtes
+        headers = select_clause.split(', ')
+        writer.writerow(headers)
+        
+        # Écrire les données
         for row in rows:
             writer.writerow(row)
         
@@ -245,8 +342,9 @@ def export_data():
         return Response(
             output.getvalue(),
             mimetype="text/csv",
-            headers={"Content-disposition": "attachment; filename=conversations.csv"}
+            headers={"Content-disposition": "attachment; filename=oracle_conversations.csv"}
         )
     except Exception as e:
         print(f"Erreur lors de l'exportation des données: {e}")
-        return "Erreur lors de l'exportation des données", 500
+        traceback_text = traceback.format_exc()
+        return f"Erreur lors de l'exportation des données: {str(e)}<br><pre>{traceback_text}</pre>", 500
