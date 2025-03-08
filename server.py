@@ -1,5 +1,8 @@
 from flask import Flask, render_template, jsonify, request, url_for
 from flask_socketio import SocketIO
+import csv
+import io
+from flask import Response
 import os
 import time
 import psycopg2
@@ -141,3 +144,109 @@ init_db()
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     socketio.run(app, host='0.0.0.0', port=port)
+
+
+
+@app.route('/admin')
+def admin():
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor(cursor_factory=DictCursor)
+        
+        cur.execute(
+            "SELECT id, timestamp, type, content FROM messages ORDER BY timestamp DESC"
+        )
+        messages = [dict(row) for row in cur.fetchall()]
+        
+        conn.close()
+        return render_template('admin.html', messages=messages)
+    except Exception as e:
+        print(f"Erreur lors de l'accès à l'administration: {e}")
+        return "Erreur lors du chargement de la page d'administration", 500
+
+@app.route('/admin/delete/<int:message_id>', methods=['POST'])
+def delete_message(message_id):
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        
+        cur.execute(
+            "DELETE FROM messages WHERE id = %s",
+            (message_id,)
+        )
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({"status": "success"}), 200
+    except Exception as e:
+        print(f"Erreur lors de la suppression du message: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/admin/update/<int:message_id>', methods=['POST'])
+def update_message(message_id):
+    try:
+        data = request.json
+        type = data.get('type')
+        content = data.get('content')
+        
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        
+        cur.execute(
+            "UPDATE messages SET type = %s, content = %s WHERE id = %s",
+            (type, content, message_id)
+        )
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({"status": "success"}), 200
+    except Exception as e:
+        print(f"Erreur lors de la mise à jour du message: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/admin/clear_all', methods=['POST'])
+def clear_all_messages():
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        
+        cur.execute("DELETE FROM messages")
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({"status": "success"}), 200
+    except Exception as e:
+        print(f"Erreur lors de la suppression de tous les messages: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/export')
+def export_data():
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        
+        cur.execute("SELECT id, timestamp, type, content FROM messages ORDER BY timestamp")
+        rows = cur.fetchall()
+        
+        conn.close()
+        
+        # Créer un CSV
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(['ID', 'Timestamp', 'Type', 'Content'])  # En-têtes
+        
+        for row in rows:
+            writer.writerow(row)
+        
+        # Renvoyer le CSV
+        return Response(
+            output.getvalue(),
+            mimetype="text/csv",
+            headers={"Content-disposition": "attachment; filename=conversations.csv"}
+        )
+    except Exception as e:
+        print(f"Erreur lors de l'exportation des données: {e}")
+        return "Erreur lors de l'exportation des données", 500
