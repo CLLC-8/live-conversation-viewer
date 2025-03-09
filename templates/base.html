@@ -23,9 +23,10 @@
             color: var(--text-color);
             margin: 0;
             padding: 0;
+            min-height: 100vh;
+            height: auto;
             display: flex;
             flex-direction: column;
-            height: 100vh;
             position: relative;
             overflow-x: hidden;
             width: 100%;
@@ -143,28 +144,30 @@
         
         /* Container principal */
         .container {
-            flex: 1;
+            flex: 1 0 auto;
             padding: 1rem;
             max-width: 1000px;
-            margin: 0 auto;
+            margin: 0 auto 60px auto;
             width: 100%;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
             position: relative;
             z-index: 10;
             animation: fadeInUp 0.8s ease forwards;
+            overflow: visible;
         }
         
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Footer */
+        .footer {
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
+            background-color: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            color: var(--secondary-text);
+            font-size: 0.8rem;
+            position: relative;
+            z-index: 5;
+            margin-top: auto;
         }
         
         /* Page content styles */
@@ -173,10 +176,11 @@
             border-radius: 8px;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
             padding: 2rem;
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
+            overflow: visible;
         }
         
         .page-content h1 {
@@ -188,6 +192,17 @@
         .page-content p {
             line-height: 1.6;
             margin-bottom: 1.5rem;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         /* Media queries */
@@ -269,8 +284,13 @@
         }
         
         @media (max-width: 600px) {
+            body {
+                min-height: 101vh;
+            }
+            
             .container {
                 padding: 0.75rem;
+                margin-bottom: 80px;
             }
             
             .page-content {
@@ -338,6 +358,10 @@
     <div class="container">
         {% block content %}{% endblock %}
     </div>
+    
+    <footer class="footer">
+        <div>© {% now "Y" %} Oracle des Dimensions | Tous droits réservés</div>
+    </footer>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
     <script>
