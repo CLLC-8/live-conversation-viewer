@@ -405,7 +405,7 @@ def galerie():
     return render_template('galerie.html', active_page='galerie')
 
 @app.route('/technique')
-def galerie():
+def technique():
     return render_template('technique.html', active_page='technique')
 
 @app.route('/bio')
