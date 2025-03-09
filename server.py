@@ -35,6 +35,30 @@ def init_db():
     try:
         print("Tentative de connexion à la base de données...")
         conn = psycopg2.connect(DATABASE_URL)
+####
+@app.route('/concept')
+def concept():
+    return render_template('concept.html', active_page='concept')
+
+@app.route('/conscience')
+def conscience():
+    return render_template('conscience.html', active_page='conscience')
+
+@app.route('/experience')
+def experience():
+    return render_template('experience.html', active_page='experience')
+
+@app.route('/galerie')
+def galerie():
+    return render_template('galerie.html', active_page='galerie')
+
+@app.route('/bio')
+def bio():
+    return render_template('bio.html', active_page='bio')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html', active_page='contact')
         cur = conn.cursor()
         print("Connexion réussie, création de la table messages...")
         
