@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, url_for
+from flask import Flask, render_template, jsonify, request, url_for, session, redirect, flash
 from flask_socketio import SocketIO
 import csv
 import io
@@ -9,18 +9,28 @@ import psycopg2
 from psycopg2.extras import DictCursor
 from datetime import datetime
 import traceback
-
 from functools import wraps
-from flask import session, redirect, url_for, request, flash
 
 app = Flask(__name__, static_folder='static')
-app.config['SECRET_KEY'] = 'votre_clé_secrète'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'une_clé_secrète_très_longue_et_aléatoire')
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Récupérer l'URL de la base de données depuis les variables d'environnement
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
-# Initialisation de la base de données - Version améliorée
+# Définir un mot de passe pour l'admin (idéalement, stockez-le dans une variable d'environnement)
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'oracle2025')  # mot de passe par défaut si non défini
+
+# Fonction décorateur pour protéger les routes admin
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_logged_in'):
+            return redirect(url_for('admin_login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# Initialisation de la base de données
 def init_db():
     try:
         print("Tentative de connexion à la base de données...")
@@ -51,7 +61,7 @@ def init_db():
     except Exception as e:
         print(f"ERREUR d'initialisation de la base de données: {e}")
 
-# Fonction pour ajouter un message à la base de données - Version corrigée
+# Fonction pour ajouter un message à la base de données
 def add_message_to_db(message_type, content):
     try:
         conn = psycopg2.connect(DATABASE_URL)
@@ -86,7 +96,7 @@ def add_message_to_db(message_type, content):
         print(f"ERREUR lors de l'ajout du message: {e}")
         return False
 
-# Fonction pour récupérer l'historique des messages - Version corrigée
+# Fonction pour récupérer l'historique des messages
 def get_message_history(limit=100):
     try:
         messages = []
@@ -113,11 +123,13 @@ def get_message_history(limit=100):
         print(f"ERREUR lors de la récupération de l'historique: {e}")
         return []
 
+# Route principale pour afficher le chat
 @app.route('/')
 def index():
     history = get_message_history()
     return render_template('index.html', history=history)
 
+# Route API pour recevoir les messages
 @app.route('/api/message', methods=['POST'])
 def receive_message():
     if request.json:
@@ -137,22 +149,35 @@ def receive_message():
         return jsonify({"status": "success"}), 200
     return jsonify({"status": "error"}), 400
 
+# Gestion des connexions Socket.IO
 @socketio.on('connect')
 def handle_connect():
     print("Client connecté")
 
-# Initialiser la base de données au démarrage
-print("Démarrage de l'application...")
-init_db()
+# Route de login admin
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    error = None
+    next_url = request.args.get('next', url_for('admin'))
+    
+    if request.method == 'POST':
+        if request.form['password'] == ADMIN_PASSWORD:
+            session['admin_logged_in'] = True
+            return redirect(next_url)
+        else:
+            error = 'Mot de passe incorrect'
+    
+    return render_template('admin_login.html', error=error)
 
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    socketio.run(app, host='0.0.0.0', port=port)
+# Route déconnexion
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    return redirect(url_for('admin_login'))
 
-
-
-# Routes d'administration
+# Route admin protégée
 @app.route('/admin')
+@admin_required
 def admin():
     debug_info = ""
     try:
@@ -229,7 +254,9 @@ def admin():
         debug_info += f"Exception: {str(e)}\n\nTraceback:\n{error_traceback}"
         return render_template('admin.html', messages=[], error=f"Erreur: {str(e)}", debug_info=debug_info)
 
+# Route pour supprimer un message
 @app.route('/admin/delete/<int:message_id>', methods=['POST'])
+@admin_required
 def delete_message(message_id):
     try:
         conn = psycopg2.connect(DATABASE_URL)
@@ -253,7 +280,9 @@ def delete_message(message_id):
         print(f"Erreur lors de la suppression du message {message_id}: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
+# Route pour mettre à jour un message
 @app.route('/admin/update/<int:message_id>', methods=['POST'])
+@admin_required
 def update_message(message_id):
     try:
         data = request.json
@@ -291,7 +320,9 @@ def update_message(message_id):
         print(f"Erreur lors de la mise à jour du message {message_id}: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
+# Route pour supprimer tous les messages
 @app.route('/admin/clear_all', methods=['POST'])
+@admin_required
 def clear_all_messages():
     try:
         conn = psycopg2.connect(DATABASE_URL)
@@ -308,7 +339,9 @@ def clear_all_messages():
         print(f"Erreur lors de la suppression de tous les messages: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
+# Route pour exporter les données en CSV
 @app.route('/export')
+@admin_required
 def export_data():
     try:
         conn = psycopg2.connect(DATABASE_URL)
@@ -352,83 +385,10 @@ def export_data():
         traceback_text = traceback.format_exc()
         return f"Erreur lors de l'exportation des données: {str(e)}<br><pre>{traceback_text}</pre>", 500
 
-# Ajoutez ces imports en haut de votre fichier
-import os
-from functools import wraps
-from flask import session, redirect, url_for, request, flash
+# Initialiser la base de données au démarrage
+print("Démarrage de l'application...")
+init_db()
 
-# Définir un mot de passe pour l'admin (idéalement, stockez-le dans une variable d'environnement)
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'oracle2025')  # mot de passe par défaut si non défini
-
-# Configuration pour les sessions
-app.secret_key = os.environ.get('SECRET_KEY', 'une_clé_secrète_très_longue_et_aléatoire')
-
-# Fonction décorateur pour protéger les routes admin
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('admin_logged_in'):
-            return redirect(url_for('admin_login', next=request.url))
-        return f(*args, **kwargs)
-    return decorated_function
-
-def admin_login():
-    error = None
-    next_url = request.args.get('next', url_for('admin'))
-    
-    if request.method == 'POST':
-        if request.form['password'] == ADMIN_PASSWORD:
-            session['admin_logged_in'] = True
-            return redirect(next_url)
-        else:
-            error = 'Mot de passe incorrect'
-    
-    return render_template('admin_login.html', error=error)
-
-# Route déconnexion
-@app.route('/admin/logout')
-def admin_logout():
-    session.pop('admin_logged_in', None)
-    return redirect(url_for('admin_login'))
-
-# Protéger la route admin avec le décorateur
-@app.route('/admin')
-@admin_required
-def admin():
-    # Votre code existant pour la page admin
-    try:
-        conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor(cursor_factory=DictCursor)
-        
-        # Récupérer les messages
-        cur.execute("SELECT id, timestamp, type, content FROM messages ORDER BY timestamp DESC")
-        messages = [dict(row) for row in cur.fetchall()]
-        
-        conn.close()
-        return render_template('admin.html', messages=messages)
-        
-    except Exception as e:
-        print(f"Erreur lors de l'accès à l'administration: {e}")
-        return render_template('admin.html', messages=[], error=f"Erreur: {str(e)}")
-
-# Protéger également les autres routes admin
-@app.route('/admin/delete/<int:message_id>', methods=['POST'])
-@admin_required
-def delete_message(message_id):
-    # Votre code existant
-
-@app.route('/admin/update/<int:message_id>', methods=['POST'])
-@admin_required
-def update_message(message_id):
-    # Votre code existant
-
-@app.route('/admin/clear_all', methods=['POST'])
-@admin_required
-def clear_all_messages():
-    # Votre code existant
-
-# La route d'exportation peut être protégée ou non selon vos besoins
-@app.route('/export')
-@admin_required  # Ajoutez cette ligne si vous voulez également protéger l'exportation
-def export_data():
-    # Votre code existant
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    socketio.run(app, host='0.0.0.0', port=port)
