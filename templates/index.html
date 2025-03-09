@@ -6,6 +6,8 @@
 /* Styles spécifiques à la page d'accueil */
 .chat-container {
     flex: 1;
+    max-height: 70vh; /* Limiter à 70% de la hauteur de la vue */
+    min-height: 400px; /* Hauteur minimale */
     overflow-y: auto;
     background-color: rgba(22, 27, 34, 0.7);
     border-radius: 8px;
@@ -16,6 +18,29 @@
     transition: all 0.3s ease;
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
+    
+    /* Personnalisation de la barre de défilement */
+    scrollbar-width: thin; /* Pour Firefox */
+    scrollbar-color: var(--accent-color) rgba(0,0,0,0.1); /* Pour Firefox */
+}
+
+/* Style de la barre de défilement pour Chrome, Edge, et Safari */
+.chat-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+    background: rgba(22, 27, 34, 0.5);
+    border-radius: 10px;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+    background-color: var(--accent-color);
+    border-radius: 10px;
+}
+
+.chat-container::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in srgb, var(--accent-color) 80%, white);
 }
 
 .chat-container:hover {
@@ -140,6 +165,11 @@
 }
 
 @media (max-width: 600px) {
+    .chat-container {
+        max-height: 80vh; /* Ajustement pour mobile */
+        min-height: 300px;
+    }
+
     .message-bubble {
         max-width: calc(100% - 60px);
     }
@@ -183,6 +213,14 @@
 {% endblock %}
 
 {% block scripts %}
+// Fonction pour faire défiler le chat tout en bas
+function scrollChatToBottom() {
+    const chatContainer = document.getElementById('chatContainer');
+    if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+}
+
 // Connexion à Socket.IO
 const socket = io();
 const chatContainer = document.getElementById('chatContainer');
@@ -248,11 +286,9 @@ socket.on('new_message', (data) => {
     chatContainer.appendChild(messageDiv);
     
     // Faire défiler vers le bas pour voir le nouveau message
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+    scrollChatToBottom();
 });
 
 // Faire défiler vers le bas au chargement initial
-window.onload = function() {
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-};
+document.addEventListener('DOMContentLoaded', scrollChatToBottom);
 {% endblock %}
