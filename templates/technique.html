@@ -52,55 +52,58 @@
     transform: translateY(0);
 }
 
+/* Style modal complètement revu */
 .modal {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background-color: rgba(0, 0, 0, 0.9);
-    z-index: 1000;
-    padding: 20px;
-    align-items: center;
-    justify-content: center;
+    z-index: 2000;
 }
 
-.modal-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
+.modal-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 90%;
+    max-height: 90vh;
+    text-align: center;
 }
 
 .modal-content {
-    max-width: 80%;
+    max-width: 100%;
     max-height: 80vh;
-    margin: 0;
-    display: block;
     object-fit: contain;
+    margin: 0 auto;
+    display: block;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.modal-caption {
+    color: #fff;
+    margin-top: 15px;
+    padding: 10px;
+    max-width: 800px;
 }
 
 .modal-close {
     position: absolute;
-    top: 20px;
-    right: 30px;
+    top: 15px;
+    right: 35px;
     color: #f1f1f1;
     font-size: 40px;
     font-weight: bold;
     cursor: pointer;
-    z-index: 1010;
+    z-index: 2010;
+    transition: color 0.2s ease;
 }
 
-.modal-caption {
-    margin-top: 15px;
-    width: 80%;
-    max-width: 700px;
-    text-align: center;
-    color: #ccc;
-    padding: 10px 0;
+.modal-close:hover {
+    color: var(--accent-color);
 }
 
 @media (max-width: 768px) {
@@ -109,7 +112,7 @@
         gap: 1rem;
     }
     
-    .modal-content {
+    .modal-inner {
         max-width: 95%;
     }
 }
@@ -255,7 +258,7 @@ def play_audio(self, audio_file):
     <!-- Modal pour afficher l'image en grand -->
     <div id="imageModal" class="modal">
         <span class="modal-close" onclick="closeModal()">&times;</span>
-        <div class="modal-wrapper">
+        <div class="modal-inner">
             <img class="modal-content" id="modalImage">
             <div id="modalCaption" class="modal-caption"></div>
         </div>
@@ -271,16 +274,20 @@ function openModal(src, caption) {
     const modalImg = document.getElementById('modalImage');
     const captionText = document.getElementById('modalCaption');
     
-    // Précharger l'image pour éviter les problèmes de dimensionnement
+    // Précharger l'image 
     const img = new Image();
     img.onload = function() {
-        modal.style.display = 'flex';
         modalImg.src = src;
         captionText.innerHTML = caption;
+        modal.style.display = 'block';
         
         // Désactiver le défilement du body
         document.body.style.overflow = 'hidden';
-    }
+    };
+    img.onerror = function() {
+        console.error('Erreur de chargement de l\'image: ' + src);
+        alert('Impossible de charger l\'image.');
+    };
     img.src = src;
 }
 
