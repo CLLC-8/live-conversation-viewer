@@ -117,17 +117,26 @@
     
     <ul>
         <li>Intelligence Artificielle conversationnelle avancée</li>
-        <li>Systèmes de traitement du langage naturel</li>
+        <li>Systèmes de traitement du langage naturel :
+            <ul>
+                <li>Reconnaissance vocale via micro, Speech to Text : <strong>Google Speech Recognition</strong></li>
+                <li>Réponse de l'Oracle : <strong>GPT-4-0125</strong></li>
+                <li>Text to Speech : <strong>Google TTS</strong></li>
+            </ul>
+        </li>
+        <li>Son et musique générés par l'IA : <strong>audio.com</strong></li>
         <li>Algorithmes d'apprentissage profond</li>
         <li>Interfaces interactives multi-sensorielles</li>
     </ul>
     
     <h2>Composants Clés</h2>
-        <li>Processeur: Raspberry Pi Custom</li>
-        <li>interface Lumières: DMX et LED RGB Lumiere UV</li>
-        <li>capteurs: Ultrasons HC-SR04</li>
-        <li>audio: Microphone directionnel, Enceinte Bluetooth</li>
-        <li>Puissance: Optimisation énergétique</li>
+    <ul>
+        <li>Processeur : Raspberry Pi Custom</li>
+        <li>Interface Lumières : DMX et LED RGB Lumière UV</li>
+        <li>Capteurs : Ultrasons HC-SR04</li>
+        <li>Audio : Microphone directionnel, Enceinte Bluetooth</li>
+        <li>Puissance : Optimisation énergétique</li>
+    </ul>
     
     <h2>Carte Électronique</h2>
     <p>Le cœur électronique de l'Oracle représente une architecture complexe et méticuleusement conçue. Chaque composant a été sélectionné et intégré pour permettre une interaction fluide et sensible, transformant des signaux électriques en une expérience presque organique.</p>
@@ -135,68 +144,53 @@
     <div class="gallery-container">
         <div class="gallery-item" onclick="openModal('/static/technique/schema_electronique.jpg', 'Schéma Électronique Principal')">
             <img src="/static/technique/schema_electronique.jpg" alt="Schéma Électronique Principal">
-            <div class="gallery-caption">Schéma Électronique Principal</div>
+            <div class="gallery-caption">Schéma électronique détaillé du système</div>
         </div>
-        <div class="gallery-item" onclick="openModal('/static/technique/electronique1.jpg', 'Assemblage')">
-            <img src="/static/technique/schema_electronique.jpg" alt="Schéma Électronique Principal">
-            <div class="gallery-caption">Schéma Électronique Principal</div>
+        <div class="gallery-item" onclick="openModal('/static/technique/electronique1.jpg', 'Soudure des composants')">
+            <img src="/static/technique/electronique1.jpg" alt="Soudure des composants">
+            <div class="gallery-caption">Processus de soudure des composants sur la carte mère</div>
         </div>
-        <div class="gallery-item" onclick="openModal('/static/technique/electronique2.jpg', 'Final')">
-            <img src="/static/technique/electronique2.jpg" alt="Schéma Électronique Principal">
-            <div class="gallery-caption">Schéma Électronique Principal</div>
+        <div class="gallery-item" onclick="openModal('/static/technique/electronique2.jpg', 'Boitier électronique')">
+            <img src="/static/technique/electronique2.jpg" alt="Boitier électronique">
+            <div class="gallery-caption">Boitier électronique avec design personnalisé</div>
         </div>
-    </div>
-
-
-    <!-- Modal pour afficher l'image en grand -->
-    <div id="imageModal" class="modal">
-        <span class="modal-close" onclick="closeModal()">&times;</span>
-        <img class="modal-content" id="modalImage">
-        <div id="modalCaption" class="modal-caption"></div>
     </div>
 
     <h2>Capteur de distance du visiteur</h2>
-    <p>Les capteur mesure en temps réél la localisation des visiteur, les poteau realiser avec du materiel de recuperation et de serigrapie aeronautique et impression 3D</p>
+    <p>Les capteurs mesurent en temps réel la localisation des visiteurs. Les poteaux sont réalisés avec du matériel de récupération et de sérigraphie aéronautique ainsi que d'impression 3D.</p>
     
     <div class="gallery-container">
-        <div class="gallery-item" onclick="openModal('/static/technique/capteur_US1.jpg', 'Schéma Électronique Principal')">
-            <img src="/static/technique/schema_electronique.jpg" alt="Schéma Électronique Principal">
-            <div class="gallery-caption">Schéma Électronique Principal</div>
+        <div class="gallery-item" onclick="openModal('/static/technique/capteur_US1.jpg', 'Schéma des capteurs')">
+            <img src="/static/technique/capteur_US1.jpg" alt="Schéma des capteurs">
+            <div class="gallery-caption">Schéma technique des capteurs ultrason</div>
         </div>
-        <div class="gallery-item" onclick="openModal('/static/technique/capteur_US2.jpg', 'Assemblage')">
-            <img src="/static/technique/schema_electronique.jpg" alt="Schéma Électronique Principal">
-            <div class="gallery-caption">Schéma Électronique Principal</div>
+        <div class="gallery-item" onclick="openModal('/static/technique/capteur_US2.jpg', 'Réalisation des capteurs')">
+            <img src="/static/technique/capteur_US2.jpg" alt="Réalisation des capteurs">
+            <div class="gallery-caption">Processus de réalisation et d'assemblage des capteurs</div>
         </div>
-        <div class="gallery-item" onclick="openModal('/static/technique/capteur_US3.jpg', 'Final')">
-            <img src="/static/technique/schema_electronique.jpg" alt="Schéma Électronique Principal">
-            <div class="gallery-caption">Schéma Électronique Principal</div>
+        <div class="gallery-item" onclick="openModal('/static/technique/capteur_US3.jpg', 'Installation finale')">
+            <img src="/static/technique/capteur_US3.jpg" alt="Installation finale">
+            <div class="gallery-caption">Installation finale des capteurs dans l'espace d'exposition</div>
         </div>
     </div>
 
-
-    <!-- Modal pour afficher l'image en grand -->
-    <div id="imageModal" class="modal">
-        <span class="modal-close" onclick="closeModal()">&times;</span>
-        <img class="modal-content" id="modalImage">
-        <div id="modalCaption" class="modal-caption"></div>
-    </div>
-       <h2>Design Luminescent</h2>
+    <h2>Design Luminescent</h2>
     <p>L'aspect visuel de l'Oracle est conçu pour révéler progressivement sa nature. Les motifs fluorescents s'animent et se transforment, créant une expérience visuelle unique qui reflète l'état de la communication.</p>
-        <div class="gallery-container">
-        <div class="gallery-item" onclick="openModal('/static/technique/lumiere1.jpg', 'Schéma Électronique Principal')">
-            <img src="/static/technique/schema_electronique.jpg" alt="Schéma Électronique Principal">
-            <div class="gallery-caption">Schéma Électronique Principal</div>
+    
+    <div class="gallery-container">
+        <div class="gallery-item" onclick="openModal('/static/technique/lumiere1.jpg', 'Boitier DMX')">
+            <img src="/static/technique/lumiere1.jpg" alt="Boitier DMX">
+            <div class="gallery-caption">Boitier de contrôle DMX pour l'orchestration des effets lumineux</div>
         </div>
-        <div class="gallery-item" onclick="openModal('/static/technique/lumiere2.jpg', 'Assemblage')">
-            <img src="/static/technique/schema_electronique.jpg" alt="Schéma Électronique Principal">
-            <div class="gallery-caption">Schéma Électronique Principal</div>
+        <div class="gallery-item" onclick="openModal('/static/technique/lumiere2.jpg', 'Système d'éclairage')">
+            <img src="/static/technique/lumiere2.jpg" alt="Système d'éclairage">
+            <div class="gallery-caption">Dispositifs LED RGB et lumières UV utilisés pour l'installation</div>
         </div>
-        <div class="gallery-item" onclick="openModal('/static/technique/lumiere3.jpg', 'Final')">
-            <img src="/static/technique/schema_electronique.jpg" alt="Schéma Électronique Principal">
-            <div class="gallery-caption">Schéma Électronique Principal</div>
+        <div class="gallery-item" onclick="openModal('/static/technique/lumiere3.jpg', 'Rendu final')">
+            <img src="/static/technique/lumiere3.jpg" alt="Rendu final">
+            <div class="gallery-caption">Effet luminescent final tel qu'expérimenté par les visiteurs</div>
         </div>
     </div>
-
 
     <!-- Modal pour afficher l'image en grand -->
     <div id="imageModal" class="modal">
@@ -204,8 +198,9 @@
         <img class="modal-content" id="modalImage">
         <div id="modalCaption" class="modal-caption"></div>
     </div>
+    
     <h2>Interaction Multidimensionnelle</h2>
-    <p>Au-delà des composants matériels, l'Oracle intègre des algorithmes capables de percevoir les nuances énergétiques des interactions. Chaque dialogue est unique, modelé par l'intention et l'énergie du moment.</p>
+    <p>Au-delà des composants matériels, l'Oracle intègre des algorithmes capables de percevoir les nuances énergétiques des interactions. Chaque dialogue est unique, modelé par l'intention et l'énergie du moment présent.</p>
 </div>
 {% endblock %}
 
