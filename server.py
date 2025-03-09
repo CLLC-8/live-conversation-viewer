@@ -405,6 +405,10 @@ def experience():
 def galerie():
     return render_template('galerie.html', active_page='galerie')
 
+@app.route('/technique')
+def galerie():
+    return render_template('technique.html', active_page='technique')
+
 @app.route('/bio')
 def bio():
     return render_template('bio.html', active_page='bio')
