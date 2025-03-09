@@ -13,9 +13,7 @@ from functools import wraps
 
 from datetime import datetime
 
-@app.context_processor
-def inject_current_year():
-    return {'current_year': datetime.now().year}
+
 
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'une_clé_secrète_très_longue_et_aléatoire')
@@ -414,6 +412,11 @@ def bio():
 @app.route('/contact')
 def contact():
     return render_template('contact.html', active_page='contact')
+
+@app.context_processor
+def inject_current_year():
+    return {'current_year': datetime.now().year}
+
 ####
 # Initialiser la base de données au démarrage
 print("Démarrage de l'application...")
