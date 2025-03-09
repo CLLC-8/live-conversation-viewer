@@ -14,8 +14,9 @@ from functools import wraps
 from datetime import datetime
 
 
-
-app = Flask(__name__, static_folder='static')
+app = Flask(__name__, 
+            static_folder='static',
+            template_folder='static') 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'une_clé_secrète_très_longue_et_aléatoire')
 socketio = SocketIO(app, cors_allowed_origins="*")
 
