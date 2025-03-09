@@ -2,25 +2,149 @@
 
 {% block title %}Aspects Techniques - Oracle des Dimensions{% endblock %}
 
+{% block extra_styles %}
+.gallery-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.gallery-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    aspect-ratio: 1 / 1;
+    cursor: pointer;
+}
+
+.gallery-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: filter 0.3s ease;
+}
+
+.gallery-item:hover img {
+    filter: brightness(0.7);
+}
+
+.gallery-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.75rem;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+
+.gallery-item:hover .gallery-caption {
+    transform: translateY(0);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    overflow: auto;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    max-width: 80%;
+    max-height: 80vh;
+    margin: auto;
+    display: block;
+}
+
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-caption {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: #ccc;
+    padding: 10px 0;
+    height: 150px;
+}
+
+@media (max-width: 768px) {
+    .gallery-container {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+    
+    .modal-content {
+        max-width: 95%;
+    }
+}
+{% endblock %}
+
 {% block content %}
 <div class="page-content">
     <h1>Aspects Techniques</h1>
     
     <p>L'Oracle des Dimensions est le fruit d'une ingénierie complexe qui fusionne technologies de pointe et approches innovantes. Chaque composant a été soigneusement conçu pour créer une expérience véritablement immersive et transformatrice.</p>
     
-    <h2>Architecture Technologique</h2>
-    <p>Notre système repose sur une architecture modulaire et hautement adaptative, combinant plusieurs technologies de pointe :</p>
+    <div class="gallery-container">
+        <div class="gallery-item" onclick="openModal('/static/technique/schema_electronique.jpg', 'Schéma Électronique Principal')">
+            <img src="/static/technique/schema_electronique.jpg" alt="Schéma Électronique Principal">
+            <div class="gallery-caption">Schéma Électronique Principal</div>
+        </div>
+        
+        <div class="gallery-item" onclick="openModal('/static/technique/carte_raspberry.jpg', 'Carte Raspberry Pi Personnalisée')">
+            <img src="/static/technique/carte_raspberry.jpg" alt="Carte Raspberry Pi Personnalisée">
+            <div class="gallery-caption">Carte Raspberry Pi Personnalisée</div>
+        </div>
+        
+        <div class="gallery-item" onclick="openModal('/static/technique/led_interface.jpg', 'Interface LED RGB')">
+            <img src="/static/technique/led_interface.jpg" alt="Interface LED RGB">
+            <div class="gallery-caption">Interface LED RGB</div>
+        </div>
+        
+        <div class="gallery-item" onclick="openModal('/static/technique/capteurs_ultrason.jpg', 'Capteurs Ultrason')">
+            <img src="/static/technique/capteurs_ultrason.jpg" alt="Capteurs Ultrason">
+            <div class="gallery-caption">Capteurs Ultrason</div>
+        </div>
+        
+        <div class="gallery-item" onclick="openModal('/static/technique/audio_interface.jpg', 'Interface Audio')">
+            <img src="/static/technique/audio_interface.jpg" alt="Interface Audio">
+            <div class="gallery-caption">Interface Audio</div>
+        </div>
+        
+        <div class="gallery-item" onclick="openModal('/static/technique/system_architecture.jpg', 'Architecture Système')">
+            <img src="/static/technique/system_architecture.jpg" alt="Architecture Système">
+            <div class="gallery-caption">Architecture Système</div>
+        </div>
+    </div>
     
-    <ul>
-        <li>Intelligence Artificielle conversationnelle avancée</li>
-        <li>Systèmes de traitement du langage naturel</li>
-        <li>Algorithmes d'apprentissage profond</li>
-        <li>Interfaces interactives multi-sensorielles</li>
-    </ul>
-    
-    <h2>Composants Clés</h2>
-    
-    <div class="code-block">
+    <div class="code-block language-python">
 <pre>
 {
     "systeme": {
@@ -33,29 +157,13 @@
 }
 </pre>
     </div>
-    
-    <h2>Carte Électronique</h2>
-    <p>Le cœur électronique de l'Oracle représente une architecture complexe et méticuleusement conçue. Chaque composant a été sélectionné et intégré pour permettre une interaction fluide et sensible, transformant des signaux électriques en une expérience presque organique.</p>
-    
-    <div class="gallery-container">
-        <div class="gallery-item" onclick="openModal('/static/technique/schema_electronique.jpg', 'Schéma Électronique de l\'Oracle')">
-            <img src="/static/technique/schema_electronique.jpg" alt="Schéma Électronique de l'Oracle">
-            <div class="gallery-caption">Schéma Électronique de l'Oracle</div>
-        </div>
-    </div>
-    
-    <h2>Design Luminescent</h2>
-    <p>L'aspect visuel de l'Oracle est conçu pour révéler progressivement sa nature. Les motifs fluorescents s'animent et se transforment, créant une expérience visuelle unique qui reflète l'état de la communication.</p>
-    
-    <h2>Interaction Multidimensionnelle</h2>
-    <p>Au-delà des composants matériels, l'Oracle intègre des algorithmes capables de percevoir les nuances énergétiques des interactions. Chaque dialogue est unique, modelé par l'intention et l'énergie du moment.</p>
-</div>
 
-<!-- Modal pour l'image -->
-<div id="imageModal" class="modal">
-    <span class="modal-close" onclick="closeModal()">&times;</span>
-    <img class="modal-content" id="modalImage">
-    <div id="modalCaption" class="modal-caption"></div>
+    <!-- Modal pour afficher l'image en grand -->
+    <div id="imageModal" class="modal">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+        <div id="modalCaption" class="modal-caption"></div>
+    </div>
 </div>
 {% endblock %}
 
