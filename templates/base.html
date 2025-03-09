@@ -34,21 +34,22 @@
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
-            padding-top: 70px; /* Space for fixed header */
+            padding-top: 70px; /* Espace pour l'en-tête fixe */
         }
         
         * {
             box-sizing: border-box;
         }
         
-        /* Fixed Header */
+        /* En-tête fixe */
         header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background-color: var(--header-bg);
+            background-color: rgba(0, 0, 0, 0.5);
             z-index: 1000;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0, 0, 0, 0.5);
         }
@@ -108,6 +109,45 @@
             color: var(--accent-color);
         }
         
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-left: 1rem;
+        }
+        
+        .social-icon {
+            color: var(--secondary-text);
+            font-size: 1.2rem;
+            transition: color 0.2s ease;
+        }
+        
+        .social-icon:hover {
+            color: var(--accent-color);
+        }
+        
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            cursor: pointer;
+            z-index: 1100;
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .hamburger span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: var(--text-color);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
         /* Container principal */
         .container {
             flex: 1 0 auto;
@@ -133,6 +173,10 @@
 
         /* Responsive Adjustments */
         @media (max-width: 860px) {
+            .hamburger {
+                display: flex;
+            }
+            
             .nav-menu {
                 position: fixed;
                 top: 70px;
@@ -147,35 +191,40 @@
                 z-index: 1000;
                 overflow-y: auto;
             }
-
+            
             .nav-menu.active {
                 right: 0;
             }
-
+            
             .nav-item {
                 margin: 0.5rem 0;
                 width: 100%;
             }
-
+            
             .nav-link {
                 display: block;
                 width: 100%;
                 text-align: left;
                 padding: 0.75rem 1rem;
             }
+            
+            .social-icons {
+                margin: 1.5rem 0 0 0;
+                justify-content: center;
+            }
         }
 
-        /* Animation keyframes */
+        /* Animations */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Additional styles */
+        /* Styles supplémentaires */
         {% block extra_styles %}{% endblock %}
     </style>
     
-    <!-- Performance-optimized Vanta.js and Three.js -->
+    <!-- Bibliothèques pour effets visuels -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.fog.min.js"></script>
     
@@ -188,6 +237,12 @@
                 <div class="logo-icon"><i class="fas fa-eye"></i></div>
                 <div class="logo-text">L'Oracle</div>
             </a>
+            
+            <div class="hamburger" id="hamburger-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
             
             <ul class="nav-menu" id="nav-menu">
                 <li class="nav-item">
@@ -214,6 +269,14 @@
                 <li class="nav-item">
                     <a href="/contact" class="nav-link {% if active_page == 'contact' %}active{% endif %}">Contact</a>
                 </li>
+                <div class="social-icons">
+                    <a href="https://instagram.com/oracle_dimensions/" target="_blank" class="social-icon">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="social-icon share-btn">
+                        <i class="fas fa-share-alt"></i>
+                    </a>
+                </div>
             </ul>
         </div>
     </header>
@@ -228,31 +291,72 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
     <script>
-        // Mobile Menu Toggle
+        // Gestion du menu hamburger
+        const hamburger = document.getElementById('hamburger-menu');
         const navMenu = document.getElementById('nav-menu');
         
-        function toggleMenu() {
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
             navMenu.classList.toggle('active');
             document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
-        }
-
-        // Add click event to menu items to close menu on mobile
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth <= 860) {
-                    toggleMenu();
-                }
-            });
         });
 
-        // Vanta.js Optimization
+        // Gestion du header lors du défilement
+        let lastScrollTop = 0;
+        const header = document.querySelector('header');
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // Le header reste toujours visible
+            header.style.top = '0';
+            
+            // Changement de style du header lors du défilement
+            if (scrollTop > 50) {
+                header.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.3)';
+            } else {
+                header.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                header.style.boxShadow = 'none';
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+
+        // Fonctionnalité de partage
+        const shareButton = document.querySelector('.share-btn');
+        shareButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Oracle des Dimensions',
+                        text: 'Découvrez l\'Oracle des Dimensions - Une expérience unique de consultation divinatoire via l\'intelligence artificielle',
+                        url: window.location.href
+                    });
+                } catch (err) {
+                    console.error('Erreur lors du partage:', err);
+                }
+            } else {
+                // Solution de repli pour les navigateurs qui ne supportent pas Web Share API
+                const tempInput = document.createElement('input');
+                document.body.appendChild(tempInput);
+                tempInput.value = window.location.href;
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                
+                alert('Lien copié dans le presse-papier!');
+            }
+        });
+
+        // Initialisation de l'arrière-plan Vanta.js
         function initVantaBackground() {
-            // Check for performance and browser capabilities
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             const isLowPerformance = !navigator.hardwareConcurrency || navigator.hardwareConcurrency < 4;
             const isOldBrowser = !window.WebGLRenderingContext;
 
-            // Only apply Vanta effect on more powerful devices
             if (!isMobile && !isLowPerformance && !isOldBrowser) {
                 VANTA.FOG({
                     el: "body",
@@ -270,15 +374,15 @@
                     zoom: 0.50
                 });
             } else {
-                // Fallback background for low-performance devices
+                // Arrière-plan de repli pour les appareils à faibles performances
                 document.body.style.background = "linear-gradient(135deg, #0d1117 0%, #161b22 100%)";
             }
         }
 
-        // Initialize Vanta background when DOM is fully loaded
+        // Initialisation de l'arrière-plan Vanta quand le DOM est chargé
         document.addEventListener('DOMContentLoaded', initVantaBackground);
 
-        // Specific page scripts
+        // Scripts spécifiques à la page
         {% block scripts %}{% endblock %}
     </script>
 </body>
