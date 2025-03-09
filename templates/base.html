@@ -47,6 +47,7 @@
             z-index: 100;
             width: 100%;
         }
+
         
         .nav-container {
             display: flex;
@@ -297,7 +298,69 @@
                 padding: 1.5rem;
             }
         }
-        
+             /* Autres styles spécifiques peuvent être définis ici */
+        /* Styles pour les blocs de code */
+    .code-block {
+        background-color: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        padding: 1rem;
+        margin: 1.5rem 0;
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        overflow-x: auto;
+        color: #e6e6e6;
+    }
+
+    .code-block pre {
+        margin: 0;
+        white-space: pre;
+    }
+
+    .code-header {
+        background-color: rgba(0, 0, 0, 0.6);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        padding: 0.5rem 1rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 0.8rem;
+        color: var(--accent-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Bouton de copie */
+    .copy-button {
+        background-color: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        color: var(--text-color);
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .copy-button:hover {
+        background-color: rgba(255, 88, 213, 0.1);
+        border-color: var(--accent-color);
+        color: var(--accent-color);
+    }
+
+    /* Coloration syntaxique */
+    .keyword { color: #ff58d5; } /* var(--accent-color) */
+    .string { color: #a5d6a7; }
+    .comment { color: #78909c; font-style: italic; }
+    .number { color: #81d4fa; }
+    .function { color: #ba68c8; }
+    .operator { color: #e6e6e6; }
+    .variable { color: #ffcc80; }
+
+
+
         /* Autres styles spécifiques peuvent être définis ici */
         {% block extra_styles %}{% endblock %}
     </style>
@@ -454,5 +517,65 @@
         // Code JavaScript spécifique à la page
         {% block scripts %}{% endblock %}
     </script>
+    
+<script>
+    // Fonction pour copier le code
+    function setupCodeBlocks() {
+        const codeBlocks = document.querySelectorAll('.code-block');
+        
+        codeBlocks.forEach((block, index) => {
+            // Si le bloc de code n'a pas déjà d'en-tête
+            if (!block.previousElementSibling || !block.previousElementSibling.classList.contains('code-header')) {
+                // Créer l'en-tête
+                const header = document.createElement('div');
+                header.classList.add('code-header');
+                
+                // Déterminer le langage à partir d'une classe (par ex. language-python)
+                let language = 'Code';
+                block.classList.forEach(cls => {
+                    if (cls.startsWith('language-')) {
+                        language = cls.replace('language-', '').toUpperCase();
+                    }
+                });
+                
+                // Ajouter le langage à l'en-tête
+                const langSpan = document.createElement('span');
+                langSpan.textContent = language;
+                header.appendChild(langSpan);
+                
+                // Ajouter le bouton de copie
+                const copyButton = document.createElement('button');
+                copyButton.classList.add('copy-button');
+                copyButton.textContent = 'Copier';
+                copyButton.dataset.target = `code-${index}`;
+                header.appendChild(copyButton);
+                
+                // Insérer l'en-tête avant le bloc de code
+                block.parentNode.insertBefore(header, block);
+                
+                // Donner un ID unique au bloc de code
+                block.id = `code-${index}`;
+                
+                // Gestionnaire d'événement pour le bouton de copie
+                copyButton.addEventListener('click', function() {
+                    const codeContent = block.querySelector('pre') ? 
+                                        block.querySelector('pre').textContent : 
+                                        block.textContent;
+                    
+                    navigator.clipboard.writeText(codeContent).then(() => {
+                        const originalText = copyButton.textContent;
+                        copyButton.textContent = 'Copié !';
+                        setTimeout(() => {
+                            copyButton.textContent = originalText;
+                        }, 2000);
+                    });
+                });
+            }
+        });
+    }
+    
+    // Exécuter le script lorsque le DOM est chargé
+    document.addEventListener('DOMContentLoaded', setupCodeBlocks);
+</script>
 </body>
 </html>
