@@ -52,18 +52,19 @@
     transform: translateY(0);
 }
 
-/* Modal révisé pour s'adapter à la position de défilement */
+/* Nouveau design modal */
 #imageModal {
     display: none;
     position: fixed;
     left: 0;
     top: 0;
-    right: 0;
-    bottom: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(0, 0, 0, 0.85);
     z-index: 9999;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
 }
 
 #modalContent {
@@ -71,8 +72,8 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 80%;
-    max-width: 1000px;
+    max-width: 90vw;
+    max-height: 90vh;
     text-align: center;
 }
 
@@ -80,32 +81,52 @@
     max-width: 100%;
     max-height: 80vh;
     object-fit: contain;
-    margin: 0 auto;
     display: block;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    margin: 0 auto;
 }
 
 #modalCaption {
     color: white;
-    margin-top: 15px;
+    margin-top: 10px;
     font-size: 1rem;
+    max-width: 100%;
 }
 
 .modal-close {
-    position: absolute;
+    position: fixed;
     top: 20px;
     right: 30px;
     color: white;
     font-size: 40px;
     font-weight: bold;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     cursor: pointer;
     z-index: 10000;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
 .modal-close:hover {
     color: var(--accent-color);
+}
+
+/* Spinner pour chargement */
+.loader {
+    border: 5px solid rgba(255, 255, 255, 0.2);
+    border-top: 5px solid var(--accent-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -20px;
+    margin-left: -20px;
+    display: none;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 @media (max-width: 768px) {
@@ -115,7 +136,7 @@
     }
     
     #modalContent {
-        width: 90%;
+        max-width: 95vw;
     }
 }
 {% endblock %}
@@ -257,9 +278,10 @@ def play_audio(self, audio_file):
     </pre>
     </div>
 
-    <!-- Modal d'image avec structure simplifiée -->
+    <!-- Modal avec indicateur de chargement -->
     <div id="imageModal">
         <span class="modal-close" onclick="closeImageModal()">&times;</span>
+        <div class="loader" id="imageLoader"></div>
         <div id="modalContent">
             <img id="modalImage" src="">
             <div id="modalCaption"></div>
@@ -269,55 +291,72 @@ def play_audio(self, audio_file):
 {% endblock %}
 
 {% block scripts %}
-// Script modal simplifié et robuste
+// Script modal entièrement révisé
 function openImageModal(src, caption) {
-    // Récupérer les éléments du DOM
+    // Récupération des éléments
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
     const captionText = document.getElementById('modalCaption');
+    const loader = document.getElementById('imageLoader');
     
-    // Bloquer le défilement de la page
+    // Affichage du loader
+    loader.style.display = 'block';
+    
+    // Masquer l'image pendant le chargement
+    modalImg.style.display = 'none';
+    
+    // Afficher le modal
+    modal.style.display = 'block';
+    
+    // Désactiver le défilement
     document.body.style.overflow = 'hidden';
     
-    // Centrer le modal dans la zone visible actuelle
-    const scrollY = window.scrollY || window.pageYOffset;
-    modal.style.top = scrollY + 'px';
-    
-    // Précharger l'image pour éviter les flashs
+    // Charger l'image
     const imgLoader = new Image();
     imgLoader.onload = function() {
-        // Une fois l'image chargée, afficher le modal
+        // Cacher le loader
+        loader.style.display = 'none';
+        
+        // Afficher l'image
         modalImg.src = src;
+        modalImg.style.display = 'block';
         captionText.innerHTML = caption;
-        modal.style.display = 'block';
     };
     
     imgLoader.onerror = function() {
-        console.error("Erreur de chargement de l'image:", src);
+        // Cacher le loader
+        loader.style.display = 'none';
+        
+        // Afficher un message d'erreur
         alert("Impossible de charger l'image.");
-        document.body.style.overflow = '';
+        closeImageModal();
     };
     
+    // Démarrer le chargement
     imgLoader.src = src;
 }
 
 function closeImageModal() {
-    // Masquer le modal et réactiver le défilement
+    // Fermer le modal
     document.getElementById('imageModal').style.display = 'none';
+    document.getElementById('imageLoader').style.display = 'none';
+    
+    // Réactiver le défilement
     document.body.style.overflow = '';
 }
 
+// Configuration des événements au chargement de la page
 document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('imageModal');
     
-    // Fermer en cliquant sur le modal (pas sur l'image)
-    modal.addEventListener('click', function(event) {
+    // Fermer en cliquant sur l'arrière-plan
+    window.addEventListener('click', function(event) {
         if (event.target === modal) {
             closeImageModal();
         }
     });
     
-    // Fermer avec la touche Escape
+    // Fermer avec Escape
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape' && modal.style.display === 'block') {
             closeImageModal();
