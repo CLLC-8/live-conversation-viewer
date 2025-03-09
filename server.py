@@ -11,6 +11,12 @@ from datetime import datetime
 import traceback
 from functools import wraps
 
+from datetime import datetime
+
+@app.context_processor
+def inject_current_year():
+    return {'current_year': datetime.now().year}
+
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'une_clé_secrète_très_longue_et_aléatoire')
 socketio = SocketIO(app, cors_allowed_origins="*")
