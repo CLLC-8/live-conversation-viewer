@@ -3,146 +3,143 @@
 {% block title %}Aspects Techniques - Oracle des Dimensions{% endblock %}
 
 {% block extra_styles %}
-.gallery-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
+body {
+  
 }
 
-.gallery-item {
-    position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    aspect-ratio: 1 / 1;
-    cursor: pointer;
+* {
+  box-sizing: border-box;
 }
 
-.gallery-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+.row > .column {
+  padding: 0 8px;
 }
 
-.gallery-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: filter 0.3s ease;
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
-.gallery-item:hover img {
-    filter: brightness(0.7);
+.column {
+  float: left;
+  width: 25%;
 }
 
-.gallery-caption {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 0.75rem;
-    transform: translateY(100%);
-    transition: transform 0.3s ease;
+/* The Modal (background) */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  padding-top: 100px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: black;
 }
 
-.gallery-item:hover .gallery-caption {
-    transform: translateY(0);
+/* Modal Content */
+.modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  width: 90%;
+  max-width: 1200px;
 }
 
-/* Modal plein écran visible */
-#imageModal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.9);
-    z-index: 9999;
-    overflow: auto;
+/* The Close Button */
+.close {
+  color: white;
+  position: absolute;
+  top: 10px;
+  right: 25px;
+  font-size: 35px;
+  font-weight: bold;
 }
 
-#modalContent {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+.close:hover,
+.close:focus {
+  color: #999;
+  text-decoration: none;
+  cursor: pointer;
 }
 
-#modalImage {
-    max-width: 95%;
-    max-height: calc(100vh - 120px); /* Réserver de l'espace pour la légende et la marge */
-    object-fit: contain;
-    margin: 0 auto;
+.mySlides {
+  display: none;
 }
 
-#modalCaption {
-    color: white;
-    margin-top: 20px;
-    text-align: center;
-    font-size: 1rem;
-    padding: 0 20px;
-    max-width: 800px;
+.cursor {
+  cursor: pointer;
 }
 
-.modal-close {
-    position: fixed;
-    top: 15px;
-    right: 25px;
-    color: white;
-    font-size: 40px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 10000;
-    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+/* Next & previous buttons */
+.prev,
+.next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  padding: 16px;
+  margin-top: -50px;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.modal-close:hover {
-    color: var(--accent-color);
+/* Position the "next button" to the right */
+.next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
 }
 
-/* Spinner de chargement */
-.loader {
-    border: 4px solid rgba(255, 255, 255, 0.2);
-    border-top: 4px solid var(--accent-color);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-top: -20px;
-    margin-left: -20px;
+/* On hover, add a black background color with a little bit see-through */
+.prev:hover,
+.next:hover {
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+/* Number text (1/3 etc) */
+.numbertext {
+  color: #f2f2f2;
+  font-size: 12px;
+  padding: 8px 12px;
+  position: absolute;
+  top: 0;
 }
 
-@media (max-width: 768px) {
-    .gallery-container {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 1rem;
-    }
-    
-    #modalCaption {
-        font-size: 0.9rem;
-    }
+img {
+  margin-bottom: -4px;
+}
+
+.caption-container {
+  text-align: center;
+  background-color: black;
+  padding: 2px 16px;
+  color: white;
+}
+
+.demo {
+  opacity: 0.6;
+}
+
+.active,
+.demo:hover {
+  opacity: 1;
+}
+
+img.hover-shadow {
+  transition: 0.3s;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 {% endblock %}
 
@@ -196,6 +193,7 @@
             <div class="gallery-caption">Installation finale des capteurs dans l'espace d'exposition</div>
         </div>
     </div>
+
   <h2>Carte Électronique</h2>
     <p>La carte electronique permettant de recolter les informations des capteurs assemblée sur le Raspberry</p>
     
@@ -238,21 +236,61 @@
     <h2>Architecture Globale</h2>
     <p>L'Oracle des Dimensions repose sur une architecture intégrée où chaque composant dialogue harmonieusement avec les autres. Cette conception holistique permet une expérience fluide où capteurs, lumières, son et intelligence artificielle fusionnent en une entité cohérente.</p>
 
-    <div class="gallery-container">
-        <div class="gallery-item" onclick="openImageModal('/static/technique/plan_installation.jpg', 'Plan d\'installation global')">
-            <img src="/static/technique/plan_installation.jpg" alt="Plan d'installation">
-            <div class="gallery-caption">Schéma détaillé de l'installation complète dans l'espace</div>
-        </div>
-        <div class="gallery-item" onclick="openImageModal('/static/technique/plan_cablage.jpg', 'Schéma de câblage')">
-            <img src="/static/technique/plan_cablage.jpg" alt="Schéma de câblage">
-            <div class="gallery-caption">Plan des connexions électriques et flux de données entre les composants</div>
-        </div>
-        <div class="gallery-item" onclick="openImageModal('/static/technique/structure_code.jpg', 'Architecture logicielle')">
-            <img src="/static/technique/structure_code.jpg" alt="Architecture logicielle">
-            <div class="gallery-caption">Structure modulaire du code Python orchestrant l'ensemble du système</div>
-        </div>
+
+<div class="row">
+  <div class="column">
+    <img src="/static/technique/plan_installation.jpg" style="width:100%" onclick="openModal();currentSlide(1)" class="hover-shadow cursor">
+  </div>
+  <div class="column">
+    <img src="/static/technique/plan_cablage.jpg" style="width:100%" onclick="openModal();currentSlide(2)" class="hover-shadow cursor">
+  </div>
+  <div class="column">
+    <img src="/static/technique/structure_code.jpg" style="width:100%" onclick="openModal();currentSlide(3)" class="hover-shadow cursor">
+  </div>
+</div>
+
+<div id="myModal" class="modal">
+  <span class="close cursor" onclick="closeModal()">&times;</span>
+  <div class="modal-content">
+
+    <div class="mySlides">
+      <div class="numbertext">1 / 3</div>
+      <img src="/static/technique/plan_installation.jpg" style="width:100%">
     </div>
 
+    <div class="mySlides">
+      <div class="numbertext">2 / 3</div>
+      <img src="/static/technique/plan_cablage.jpg" style="width:100%">
+    </div>
+
+    <div class="mySlides">
+      <div class="numbertext">3 / 3</div>
+      <img src="/static/technique/structure_code.jpg" style="width:100%">
+    </div>
+    
+    
+    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+    <a class="next" onclick="plusSlides(1)">&#10095;</a>
+
+    <div class="caption-container">
+      <p id="caption"></p>
+    </div>
+
+
+    <div class="column">
+      <img class="demo cursor" src="/static/technique/plan_installation.jpg" style="width:100%" onclick="currentSlide(1)" alt="Plan d'installation">
+    </div>
+    <div class="column">
+      <img class="demo cursor" src="/static/technique/plan_cablage.jpg" style="width:100%" onclick="currentSlide(2)" alt="Schéma de câblage">
+    </div>
+    <div class="column">
+      <img class="demo cursor" src="/static/technique/structure_code.jpg" style="width:100%" onclick="currentSlide(3)" alt="Architecture logiciell">
+    </div>
+  </div>
+</div>
+
+
+    
  <h2>Interaction Multidimensionnelle</h2>
    
     <p>Au-delà des considérations techniques conventionnelles, l'Oracle intègre une approche unique d'optimisation énergétique. Le système incorpore une fonction que nous avons nommée "le vide pour rien" - un espace algorithmique délibérément non structuré qui permet à l'intelligence universelle de s'exprimer à travers la technologie.</p>
@@ -283,92 +321,45 @@ def play_audio(self, audio_file):
     </pre>
     </div>
 
-    <!-- Modal avec approche flexbox pour remplir l'écran visible -->
-    <div id="imageModal">
-        <span class="modal-close" onclick="closeImageModal()">&times;</span>
-        <div id="modalContent">
-            <div class="loader" id="imageLoader"></div>
-            <img id="modalImage" src="">
-            <div id="modalCaption"></div>
-        </div>
-    </div>
+   
    </div>
 {% endblock %}
 
 {% block scripts %}
-// Script modal optimisé
-function openImageModal(src, caption) {
-    // Récupération des éléments
-    const modal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImage');
-    const captionText = document.getElementById('modalCaption');
-    const loader = document.getElementById('imageLoader');
-    
-    // Afficher le loader
-    loader.style.display = 'block';
-    
-    // Masquer l'image pendant le chargement
-    modalImg.style.display = 'none';
-    
-    // Afficher le modal
-    modal.style.display = 'block';
-    
-    // Désactiver le défilement
-    document.body.style.overflow = 'hidden';
-    
-    // Charger l'image
-    const imgLoader = new Image();
-    imgLoader.onload = function() {
-        // Masquer le loader
-        loader.style.display = 'none';
-        
-        // Afficher l'image chargée
-        modalImg.src = src;
-        modalImg.style.display = 'block';
-        captionText.innerHTML = caption;
-    };
-    
-    imgLoader.onerror = function() {
-        // Masquer le loader
-        loader.style.display = 'none';
-        
-        // Afficher un message d'erreur
-        alert("Impossible de charger l'image.");
-        closeImageModal();
-    };
-    
-    // Démarrer le chargement
-    imgLoader.src = src;
+function openModal() {
+  document.getElementById("myModal").style.display = "block";
 }
 
-function closeImageModal() {
-    // Fermer le modal
-    const modal = document.getElementById('imageModal');
-    const loader = document.getElementById('imageLoader');
-    
-    modal.style.display = 'none';
-    loader.style.display = 'none';
-    
-    // Réactiver le défilement
-    document.body.style.overflow = '';
+function closeModal() {
+  document.getElementById("myModal").style.display = "none";
 }
 
-// Configuration des événements
-document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('imageModal');
-    
-    // Fermer en cliquant sur l'arrière-plan (mais pas sur l'image)
-    modal.addEventListener('click', function(event) {
-        if (event.target === modal || event.target.id === 'modalContent') {
-            closeImageModal();
-        }
-    });
-    
-    // Fermer avec Escape
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape' && modal.style.display === 'block') {
-            closeImageModal();
-        }
-    });
-});
+var slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  var i;
+  var slides = document.getElementsByClassName("mySlides");
+  var dots = document.getElementsByClassName("demo");
+  var captionText = document.getElementById("caption");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none";
+  }
+  for (i = 0; i < dots.length; i++) {
+      dots[i].className = dots[i].className.replace(" active", "");
+  }
+  slides[slideIndex-1].style.display = "block";
+  dots[slideIndex-1].className += " active";
+  captionText.innerHTML = dots[slideIndex-1].alt;
+}
 {% endblock %}
