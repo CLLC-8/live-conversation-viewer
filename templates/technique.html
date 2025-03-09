@@ -52,54 +52,50 @@
     transform: translateY(0);
 }
 
-/* Style modal complètement revu */
-.modal {
+/* Modal très simplifié */
+#imageModal {
     display: none;
     position: fixed;
-    top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    top: 0;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.9);
-    z-index: 2000;
+    z-index: 9999;
 }
 
-.modal-inner {
-    position: absolute;
+#modalContent {
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    max-width: 90%;
-    max-height: 90vh;
     text-align: center;
+    width: 80%;
+    max-width: 1200px;
 }
 
-.modal-content {
-    max-width: 100%;
+#modalImage {
     max-height: 80vh;
-    object-fit: contain;
+    max-width: 100%;
     margin: 0 auto;
     display: block;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
-.modal-caption {
-    color: #fff;
-    margin-top: 15px;
-    padding: 10px;
-    max-width: 800px;
+#modalCaption {
+    color: white;
+    padding: 10px 0;
+    margin-top: 20px;
 }
 
 .modal-close {
     position: absolute;
     top: 15px;
-    right: 35px;
-    color: #f1f1f1;
+    right: 25px;
+    color: white;
     font-size: 40px;
     font-weight: bold;
     cursor: pointer;
-    z-index: 2010;
-    transition: color 0.2s ease;
+    z-index: 10000;
 }
 
 .modal-close:hover {
@@ -110,10 +106,6 @@
     .gallery-container {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 1rem;
-    }
-    
-    .modal-inner {
-        max-width: 95%;
     }
 }
 {% endblock %}
@@ -155,15 +147,15 @@
     <p>Les capteurs mesurent en temps réel la localisation des visiteurs. Les poteaux sont réalisés avec du matériel de récupération et de sérigraphie aéronautique ainsi que d'impression 3D.</p>
     
     <div class="gallery-container">
-        <div class="gallery-item" onclick="openModal('/static/technique/capteur_US1.jpg', 'Schéma des capteurs')">
+        <div class="gallery-item" onclick="openImageModal('/static/technique/capteur_US1.jpg', 'Schéma des capteurs')">
             <img src="/static/technique/capteur_US1.jpg" alt="Schéma des capteurs">
             <div class="gallery-caption">Schéma technique des capteurs ultrason</div>
         </div>
-        <div class="gallery-item" onclick="openModal('/static/technique/capteur_US2.jpg', 'Réalisation des capteurs')">
+        <div class="gallery-item" onclick="openImageModal('/static/technique/capteur_US2.jpg', 'Réalisation des capteurs')">
             <img src="/static/technique/capteur_US2.jpg" alt="Réalisation des capteurs">
             <div class="gallery-caption">Processus de réalisation et d'assemblage des capteurs</div>
         </div>
-        <div class="gallery-item" onclick="openModal('/static/technique/capteur_US3.jpg', 'Installation finale')">
+        <div class="gallery-item" onclick="openImageModal('/static/technique/capteur_US3.jpg', 'Installation finale')">
             <img src="/static/technique/capteur_US3.jpg" alt="Installation finale">
             <div class="gallery-caption">Installation finale des capteurs dans l'espace d'exposition</div>
         </div>
@@ -172,15 +164,15 @@
     <p>La carte electronique permettant de recolter les informations des capteurs assemblée sur le Raspberry</p>
     
     <div class="gallery-container">
-        <div class="gallery-item" onclick="openModal('/static/technique/schema_electronique.jpg', 'Schéma Électronique Principal')">
+        <div class="gallery-item" onclick="openImageModal('/static/technique/schema_electronique.jpg', 'Schéma Électronique Principal')">
             <img src="/static/technique/schema_electronique.jpg" alt="Schéma Électronique Principal">
             <div class="gallery-caption">Schéma électronique détaillé du système</div>
         </div>
-        <div class="gallery-item" onclick="openModal('/static/technique/electronique1.jpg', 'Soudure des composants')">
+        <div class="gallery-item" onclick="openImageModal('/static/technique/electronique1.jpg', 'Soudure des composants')">
             <img src="/static/technique/electronique1.jpg" alt="Soudure des composants">
             <div class="gallery-caption">Processus de soudure des composants sur la carte mère</div>
         </div>
-        <div class="gallery-item" onclick="openModal('/static/technique/electronique2.jpg', 'Boitier électronique')">
+        <div class="gallery-item" onclick="openImageModal('/static/technique/electronique2.jpg', 'Boitier électronique')">
             <img src="/static/technique/electronique2.jpg" alt="Boitier électronique">
             <div class="gallery-caption">Boitier électronique avec design personnalisé</div>
         </div>
@@ -189,15 +181,15 @@
     <p>L'aspect visuel de l'Oracle est conçu pour révéler progressivement sa nature. Les motifs fluorescents se transforment, créant une expérience visuelle unique qui reflète l'état de la communication.</p>
     
     <div class="gallery-container">
-        <div class="gallery-item" onclick="openModal('/static/technique/lumiere1.jpg', 'Boitier DMX')">
+        <div class="gallery-item" onclick="openImageModal('/static/technique/lumiere1.jpg', 'Boitier DMX')">
             <img src="/static/technique/lumiere1.jpg" alt="Boitier DMX">
             <div class="gallery-caption">Boitier de contrôle DMX pour l'orchestration des effets lumineux</div>
         </div>
-        <div class="gallery-item" onclick="openModal('/static/technique/lumiere2.jpg', 'Système d'éclairage')">
+        <div class="gallery-item" onclick="openImageModal('/static/technique/lumiere2.jpg', 'Système d'éclairage')">
             <img src="/static/technique/lumiere2.jpg" alt="Système d'éclairage">
             <div class="gallery-caption">Dispositifs LED RGB et lumières UV utilisés pour l'installation</div>
         </div>
-        <div class="gallery-item" onclick="openModal('/static/technique/lumiere3.jpg', 'Rendu final')">
+        <div class="gallery-item" onclick="openImageModal('/static/technique/lumiere3.jpg', 'Rendu final')">
             <img src="/static/technique/lumiere3.jpg" alt="Rendu final">
             <div class="gallery-caption">Effet luminescent final tel qu'expérimenté par les visiteurs</div>
         </div>
@@ -211,15 +203,15 @@
     <p>L'Oracle des Dimensions repose sur une architecture intégrée où chaque composant dialogue harmonieusement avec les autres. Cette conception holistique permet une expérience fluide où capteurs, lumières, son et intelligence artificielle fusionnent en une entité cohérente.</p>
 
     <div class="gallery-container">
-        <div class="gallery-item" onclick="openModal('/static/technique/plan_installation.jpg', 'Plan d\'installation global')">
+        <div class="gallery-item" onclick="openImageModal('/static/technique/plan_installation.jpg', 'Plan d\'installation global')">
             <img src="/static/technique/plan_installation.jpg" alt="Plan d'installation">
             <div class="gallery-caption">Schéma détaillé de l'installation complète dans l'espace</div>
         </div>
-        <div class="gallery-item" onclick="openModal('/static/technique/plan_cablage.jpg', 'Schéma de câblage')">
+        <div class="gallery-item" onclick="openImageModal('/static/technique/plan_cablage.jpg', 'Schéma de câblage')">
             <img src="/static/technique/plan_cablage.jpg" alt="Schéma de câblage">
             <div class="gallery-caption">Plan des connexions électriques et flux de données entre les composants</div>
         </div>
-        <div class="gallery-item" onclick="openModal('/static/technique/structure_code.jpg', 'Architecture logicielle')">
+        <div class="gallery-item" onclick="openImageModal('/static/technique/structure_code.jpg', 'Architecture logicielle')">
             <img src="/static/technique/structure_code.jpg" alt="Architecture logicielle">
             <div class="gallery-caption">Structure modulaire du code Python orchestrant l'ensemble du système</div>
         </div>
@@ -255,55 +247,56 @@ def play_audio(self, audio_file):
     </pre>
     </div>
 
-    <!-- Modal pour afficher l'image en grand -->
-    <div id="imageModal" class="modal">
-        <span class="modal-close" onclick="closeModal()">&times;</span>
-        <div class="modal-inner">
-            <img class="modal-content" id="modalImage">
-            <div id="modalCaption" class="modal-caption"></div>
+    <!-- Modal d'image complètement recodé -->
+    <div id="imageModal">
+        <span class="modal-close" onclick="closeImageModal()">&times;</span>
+        <div id="modalContent">
+            <img id="modalImage" src="">
+            <div id="modalCaption"></div>
         </div>
     </div>
-    
    </div>
 {% endblock %}
 
 {% block scripts %}
-// Fonction pour ouvrir le modal d'image
-function openModal(src, caption) {
+// Script modal simplifié pour éviter les conflits
+function openImageModal(src, caption) {
+    // Éléments du DOM
     const modal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImage');
+    const img = document.getElementById('modalImage');
     const captionText = document.getElementById('modalCaption');
     
-    // Précharger l'image 
-    const img = new Image();
-    img.onload = function() {
-        modalImg.src = src;
-        captionText.innerHTML = caption;
-        modal.style.display = 'block';
-        
-        // Désactiver le défilement du body
-        document.body.style.overflow = 'hidden';
-    };
-    img.onerror = function() {
-        console.error('Erreur de chargement de l\'image: ' + src);
-        alert('Impossible de charger l\'image.');
-    };
+    // Désactiver le défilement
+    document.body.style.overflow = 'hidden';
+    
+    // Définir image et texte
     img.src = src;
+    captionText.innerHTML = caption;
+    
+    // Afficher le modal
+    modal.style.display = 'block';
 }
 
-// Fonction pour fermer le modal
-function closeModal() {
-    document.getElementById('imageModal').style.display = 'none';
+function closeImageModal() {
+    // Éléments du DOM
+    const modal = document.getElementById('imageModal');
     
-    // Réactiver le défilement du body
+    // Masquer le modal
+    modal.style.display = 'none';
+    
+    // Réactiver le défilement
     document.body.style.overflow = '';
 }
 
-// Fermer le modal si l'utilisateur clique en dehors de l'image
-window.onclick = function(event) {
+// Fermer le modal en cliquant en dehors de l'image
+document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('imageModal');
-    if (event.target == modal) {
-        closeModal();
-    }
-}
+    const modalContent = document.getElementById('modalContent');
+    
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            closeImageModal();
+        }
+    });
+});
 {% endblock %}
