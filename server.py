@@ -35,30 +35,6 @@ def init_db():
     try:
         print("Tentative de connexion à la base de données...")
         conn = psycopg2.connect(DATABASE_URL)
-####
-@app.route('/concept')
-def concept():
-    return render_template('concept.html', active_page='concept')
-
-@app.route('/conscience')
-def conscience():
-    return render_template('conscience.html', active_page='conscience')
-
-@app.route('/experience')
-def experience():
-    return render_template('experience.html', active_page='experience')
-
-@app.route('/galerie')
-def galerie():
-    return render_template('galerie.html', active_page='galerie')
-
-@app.route('/bio')
-def bio():
-    return render_template('bio.html', active_page='bio')
-
-@app.route('/contact')
-def contact():
-    return render_template('contact.html', active_page='contact')
         cur = conn.cursor()
         print("Connexion réussie, création de la table messages...")
         
@@ -151,7 +127,7 @@ def get_message_history(limit=100):
 @app.route('/')
 def index():
     history = get_message_history()
-    return render_template('index.html', history=history)
+    return render_template('index.html', history=history, active_page='index')
 
 # Route API pour recevoir les messages
 @app.route('/api/message', methods=['POST'])
@@ -408,7 +384,31 @@ def export_data():
         print(f"Erreur lors de l'exportation des données: {e}")
         traceback_text = traceback.format_exc()
         return f"Erreur lors de l'exportation des données: {str(e)}<br><pre>{traceback_text}</pre>", 500
+####
+@app.route('/concept')
+def concept():
+    return render_template('concept.html', active_page='concept')
 
+@app.route('/conscience')
+def conscience():
+    return render_template('conscience.html', active_page='conscience')
+
+@app.route('/experience')
+def experience():
+    return render_template('experience.html', active_page='experience')
+
+@app.route('/galerie')
+def galerie():
+    return render_template('galerie.html', active_page='galerie')
+
+@app.route('/bio')
+def bio():
+    return render_template('bio.html', active_page='bio')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html', active_page='contact')
+####
 # Initialiser la base de données au démarrage
 print("Démarrage de l'application...")
 init_db()
