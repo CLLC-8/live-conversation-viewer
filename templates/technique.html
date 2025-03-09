@@ -281,7 +281,7 @@ function openImageModal(src, caption) {
     
     // Centrer le modal dans la zone visible actuelle
     const scrollY = window.scrollY || window.pageYOffset;
-    modal.style.top = scrollY + 'px';
+    modal.style.top = calc(scrollY -50) + 'px';
     
     // Précharger l'image pour éviter les flashs
     const imgLoader = new Image();
