@@ -51,7 +51,7 @@
     <p>Au-delà des composants matériels, l'Oracle intègre des algorithmes capables de percevoir les nuances énergétiques des interactions. Chaque dialogue est unique, modelé par l'intention et l'énergie du moment.</p>
 </div>
 
-<!-- Modal pour l'image (copié de galerie.html) -->
+<!-- Modal pour l'image -->
 <div id="imageModal" class="modal">
     <span class="modal-close" onclick="closeModal()">&times;</span>
     <img class="modal-content" id="modalImage">
@@ -60,7 +60,7 @@
 {% endblock %}
 
 {% block scripts %}
-// Fonction pour ouvrir le modal d'image (copié de galerie.html)
+// Fonction pour ouvrir le modal d'image
 function openModal(src, caption) {
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
@@ -89,47 +89,4 @@ window.onclick = function(event) {
         closeModal();
     }
 }
-{% endblock %}
-{% extends "base.html" %}
-
-{% block title %}Aspects Techniques - Oracle des Dimensions{% endblock %}
-
-{% block content %}
-<div class="page-content">
-    <h1>Aspects Techniques</h1>
-    
-    <p>L'Oracle des Dimensions est le fruit d'une ingénierie complexe qui fusionne technologies de pointe et approches innovantes. Chaque composant a été soigneusement conçu pour créer une expérience véritablement immersive et transformatrice.</p>
-    
-    <h2>Architecture Technologique</h2>
-    <p>Notre système repose sur une architecture modulaire et hautement adaptative, combinant plusieurs technologies de pointe :</p>
-    
-    <ul>
-        <li>Intelligence Artificielle conversationnelle avancée</li>
-        <li>Systèmes de traitement du langage naturel</li>
-        <li>Algorithmes d'apprentissage profond</li>
-        <li>Interfaces interactives multi-sensorielles</li>
-    </ul>
-    
-    <h2>Composants Clés</h2>
-    
-    <div class="code-block">
-<pre>
-{
-    "systeme": {
-        "processeur": "Raspberry Pi Custom",
-        "interface": "DMX et LED RGB",
-        "capteurs": "Ultrasons HC-SR04",
-        "audio": "Microphone directionnel Maono",
-        "puissance": "Optimisation énergétique"
-    }
-}
-</pre>
-    </div>
-    
-    <h2>Design Luminescent</h2>
-    <p>L'aspect visuel de l'Oracle est conçu pour révéler progressivement sa nature. Les motifs fluorescents s'animent et se transforment, créant une expérience visuelle unique qui reflète l'état de la communication.</p>
-    
-    <h2>Interaction Multidimensionnelle</h2>
-    <p>Au-delà des composants matériels, l'Oracle intègre des algorithmes capables de percevoir les nuances énergétiques des interactions. Chaque dialogue est unique, modelé par l'intention et l'énergie du moment.</p>
-</div>
 {% endblock %}
