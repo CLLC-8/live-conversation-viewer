@@ -10,6 +10,9 @@ from psycopg2.extras import DictCursor
 from datetime import datetime
 import traceback
 
+from functools import wraps
+from flask import session, redirect, url_for, request, flash
+
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = 'votre_clé_secrète'
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -348,3 +351,84 @@ def export_data():
         print(f"Erreur lors de l'exportation des données: {e}")
         traceback_text = traceback.format_exc()
         return f"Erreur lors de l'exportation des données: {str(e)}<br><pre>{traceback_text}</pre>", 500
+
+# Ajoutez ces imports en haut de votre fichier
+import os
+from functools import wraps
+from flask import session, redirect, url_for, request, flash
+
+# Définir un mot de passe pour l'admin (idéalement, stockez-le dans une variable d'environnement)
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'oracle2025')  # mot de passe par défaut si non défini
+
+# Configuration pour les sessions
+app.secret_key = os.environ.get('SECRET_KEY', 'une_clé_secrète_très_longue_et_aléatoire')
+
+# Fonction décorateur pour protéger les routes admin
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_logged_in'):
+            return redirect(url_for('admin_login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def admin_login():
+    error = None
+    next_url = request.args.get('next', url_for('admin'))
+    
+    if request.method == 'POST':
+        if request.form['password'] == ADMIN_PASSWORD:
+            session['admin_logged_in'] = True
+            return redirect(next_url)
+        else:
+            error = 'Mot de passe incorrect'
+    
+    return render_template('admin_login.html', error=error)
+
+# Route déconnexion
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    return redirect(url_for('admin_login'))
+
+# Protéger la route admin avec le décorateur
+@app.route('/admin')
+@admin_required
+def admin():
+    # Votre code existant pour la page admin
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor(cursor_factory=DictCursor)
+        
+        # Récupérer les messages
+        cur.execute("SELECT id, timestamp, type, content FROM messages ORDER BY timestamp DESC")
+        messages = [dict(row) for row in cur.fetchall()]
+        
+        conn.close()
+        return render_template('admin.html', messages=messages)
+        
+    except Exception as e:
+        print(f"Erreur lors de l'accès à l'administration: {e}")
+        return render_template('admin.html', messages=[], error=f"Erreur: {str(e)}")
+
+# Protéger également les autres routes admin
+@app.route('/admin/delete/<int:message_id>', methods=['POST'])
+@admin_required
+def delete_message(message_id):
+    # Votre code existant
+
+@app.route('/admin/update/<int:message_id>', methods=['POST'])
+@admin_required
+def update_message(message_id):
+    # Votre code existant
+
+@app.route('/admin/clear_all', methods=['POST'])
+@admin_required
+def clear_all_messages():
+    # Votre code existant
+
+# La route d'exportation peut être protégée ou non selon vos besoins
+@app.route('/export')
+@admin_required  # Ajoutez cette ligne si vous voulez également protéger l'exportation
+def export_data():
+    # Votre code existant
